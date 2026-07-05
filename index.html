@@ -1,0 +1,2272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Central de Comando - Executivo</title>
+
+    <!-- PWA desativado temporariamente para testes online sem erros 404 -->
+    <!-- 
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Comando Pessoal">
+    -->
+    
+    <meta name="theme-color" content="#070a13">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#070a13',
+                        brandCard: '#111827',
+                        brandBlue: '#3b82f6',
+                        brandGreen: '#10b981',
+                        brandRed: '#ef4444',
+                        brandBorder: '#1f2937',
+                        brandOrange: '#f59e0b',
+                        brandCyan: '#06b6d4',
+                        brandPurple: '#8b5cf6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070a13;
+            color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+        .active-tab-btn { 
+            color: #3b82f6 !important; 
+            border-bottom: 3px solid #3b82f6; 
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0) 60%, rgba(59, 130, 246, 0.08) 100%);
+        }
+        .tab-content { display: none; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .tab-content.active { display: block; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .active-task-pulse {
+            border-left: 4px solid #10b981 !important;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0) 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05);
+        }
+        input[type="checkbox"] {
+            appearance: none; width: 20px; height: 20px;
+            border: 2px solid #3b82f6; border-radius: 6px;
+            outline: none; cursor: pointer; position: relative;
+            transition: all 0.2s ease; flex-shrink: 0;
+            background-color: #111827;
+        }
+        input[type="checkbox"]:checked { background-color: #10b981; border-color: #10b981; }
+        input[type="checkbox"]:checked::after {
+            content: '✓'; position: absolute; color: #070a13; font-size: 13px; font-weight: 900;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .task-done-text { text-decoration: line-through; color: #4b5563; }
+        .modal {
+            display: none; position: fixed; z-index: 100;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(3, 7, 18, 0.85); backdrop-filter: blur(6px);
+        }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        #toast {
+            visibility: hidden; min-width: 280px;
+            background-color: #1f2937; color: #fff; text-align: center;
+            border-radius: 12px; padding: 14px; position: fixed; z-index: 1000;
+            left: 50%; transform: translateX(-50%); bottom: 30px; font-size: 13px; font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.7);
+        }
+        #toast.show { visibility: visible; animation: fadeinToast 0.4s ease-out, fadeoutToast 0.4s ease-in 2.6s; }
+        @keyframes fadeinToast { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeoutToast { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border-radius: 8px; border: 1px solid transparent; transition: all 0.15s ease; }
+        .cal-work { background-color: rgba(59, 130, 246, 0.12); color: #60a5fa; border-color: rgba(59, 130, 246, 0.25); }
+        .cal-free { background-color: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.25); }
+        .cal-today { border-color: #ffffff !important; box-shadow: inset 0 0 0 2px #fff; }
+        .cal-header { font-size: 9px; color: #6b7280; text-transform: uppercase; text-align: center; margin-bottom: 6px; font-weight: bold; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col max-w-md mx-auto relative px-4 pb-12">
+
+    <!-- CABEÇALHO DA CENTRAL -->
+    <header class="py-4 mt-2 border-b border-brandBorder">
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight text-white uppercase flex items-center gap-1.5">
+                    Comando Pessoal <span class="text-xs px-2 py-0.5 bg-brandBlue/10 text-brandBlue rounded-full font-mono">v7.0</span>
+                </h1>
+                <p class="text-[10px] text-brandBlue font-bold tracking-widest uppercase">Constância, Foco & Disciplina</p>
+            </div>
+            <div class="bg-brandCard border border-brandBorder px-3 py-1 rounded-full text-xs font-mono text-slate-400 font-bold" id="live-clock">
+                00:00:00
+            </div>
+        </div>
+
+        <!-- CONSOLE DE STATUS RPG (XP, RANK, SEQUÊNCIA & GELINHO) -->
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-3.5 flex flex-col gap-2.5 shadow-md cursor-pointer hover:bg-slate-800/40 transition-all active:scale-[0.99]" onclick="openRanksModal()">
+            <div class="flex justify-between items-center">
+                <div class="flex flex-col">
+                    <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Patamar de Combate</span>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="text-xs px-2 py-0.5 bg-brandPurple/20 text-brandPurple rounded-full font-black text-[10px] border border-brandPurple/35" id="rpg-level">Nível 1</span>
+                        <strong class="text-[10px] uppercase font-black tracking-wide" id="rpg-rank">Recruta Neófito 🛡️</strong>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex flex-col items-center" title="Dias Perfeitos Seguidos" onclick="event.stopPropagation()">
+                        <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Sequência</span>
+                        <span class="text-xs font-black text-brandOrange mt-0.5 flex items-center gap-0.5">🔥 <span id="rpg-streak">0d</span></span>
+                    </div>
+                    <div class="flex flex-col items-center cursor-pointer" onclick="buyFreeze(); event.stopPropagation()" title="Gelinho de Proteção (Custo: 200 XP)">
+                        <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Perdões (Gelinhos)</span>
+                        <span class="text-xs font-black text-brandCyan mt-0.5 flex items-center gap-0.5">❄️ <span id="rpg-freezes">0/3</span></span>
+                    </div>
+                </div>
+            </div>
+            <!-- BARRA DE EXPERIÊNCIA (XP) -->
+            <div>
+                <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder relative overflow-hidden">
+                    <div class="bg-gradient-to-r from-brandPurple to-brandCyan h-full transition-all duration-500 rounded-full" id="rpg-xp-bar" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-[8px] font-mono text-slate-500 mt-1" onclick="event.stopPropagation()">
+                    <span id="rpg-xp-text">0 / 100 XP</span>
+                    <button onclick="openRanksModal()" class="hover:text-brandCyan transition-colors font-bold uppercase tracking-wider flex items-center gap-0.5 text-slate-400">Ver Tiers 🏆</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STATUS DA ESCALA -->
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-3.5 flex justify-between items-center cursor-pointer hover:bg-slate-800/50 transition-all active:scale-[0.99] shadow-md" onclick="openCalendarModal()">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brandDark border border-brandBorder flex items-center justify-center text-xl" id="scale-icon">
+                    ⚙️
+                </div>
+                <div>
+                    <span class="block text-[9px] text-slate-400 font-extrabold uppercase mb-0.5 flex items-center gap-1">
+                        Escala Operacional (6x3) <span class="text-[10px]">📅</span>
+                    </span>
+                    <strong class="text-xs text-brandGreen font-extrabold" id="scale-status-text">Calculando ciclo atual...</strong>
+                </div>
+            </div>
+            <span class="text-xs text-brandBlue font-extrabold uppercase tracking-wide">Ver Escala</span>
+        </div>
+    </header>
+
+    <!-- NAVEGAÇÃO PRINCIPAL -->
+    <nav class="flex overflow-x-auto scrollbar-none whitespace-nowrap border-b border-brandBorder bg-brandDark sticky top-0 z-40 mb-4 text-[11px] font-bold scroll-smooth">
+        <button onclick="openTab(event, 'tab-rotina')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all active-tab-btn flex flex-col items-center gap-1">
+            <span class="text-base">⏳</span><span>Rotina</span>
+        </button>
+        <button onclick="openTab(event, 'tab-agenda')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
+            <span class="text-base">📅</span><span>Agenda</span>
+        </button>
+        <button onclick="openTab(event, 'tab-dieta')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
+            <span class="text-base">🥗</span><span>Dieta & Água</span>
+        </button>
+        <button onclick="openTab(event, 'tab-metas')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
+            <span class="text-base">🎯</span><span>Metas</span>
+        </button>
+        <button onclick="openTab(event, 'tab-config')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
+            <span class="text-base">⚙️</span><span>Ajustes</span>
+        </button>
+    </nav>
+
+    <!-- TOAST DE NOTIFICAÇÃO -->
+    <div id="toast">Operação realizada com sucesso!</div>
+
+    <!-- CONTEÚDO PRINCIPAL (TABS) -->
+    <main class="flex-1">
+        
+        <!-- ================= TAB: ROTINA ================= -->
+        <section id="tab-rotina" class="tab-content active">
+            <!-- SELETOR DE MODELOS -->
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button onclick="switchMode('A')" id="btn-mode-A" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandBlue text-white flex flex-col items-center justify-center active:scale-95">
+                    <span class="mb-1 text-base">🏢💪</span> [A] CLT + Treino
+                </button>
+                <button onclick="switchMode('B')" id="btn-mode-B" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95">
+                    <span class="mb-1 text-base">🏢🛋️</span> [B] CLT s/ Treino
+                </button>
+                <button onclick="switchMode('C')" id="btn-mode-C" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95">
+                    <span class="mb-1 text-base">🌴💪</span> [C] Folga + Treino
+                </button>
+                <button onclick="switchMode('D')" id="btn-mode-D" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95">
+                    <span class="mb-1 text-base">🌴🎮</span> [D] Folga Total
+                </button>
+            </div>
+
+            <!-- CARD DE PROGRESSO DE TAREFAS -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] text-slate-400 font-extrabold uppercase">Desempenho Diário</span>
+                    <strong class="text-xs text-brandBlue font-mono" id="routine-progress-percent">0% Concluído</strong>
+                </div>
+                <div class="w-full bg-brandDark rounded-full h-3 border border-brandBorder">
+                    <div class="bg-gradient-to-r from-brandBlue to-brandGreen h-3 rounded-full transition-all duration-500" id="routine-progress-bar" style="width: 0%"></div>
+                </div>
+                <p class="text-[9px] text-slate-500 mt-2 italic text-center" id="routine-motivational-text">Execute a primeira tarefa para engrenar!</p>
+            </div>
+
+            <!-- CONTROLE DO MÓDULO -->
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider" id="routine-title-display">Modelo [A]</h2>
+                <button onclick="openTaskModal()" class="text-[10px] bg-brandBlue/10 border border-brandBlue/30 text-brandBlue px-2.5 py-1.5 rounded-xl font-bold hover:bg-brandBlue hover:text-white transition-all active:scale-95">+ Nova Tarefa</button>
+            </div>
+
+            <!-- CONTAINER DE TAREFAS -->
+            <div class="flex flex-col gap-2.5" id="routine-tasks-container"></div>
+
+            <!-- WIDGET DE COBRANÇA MENTAL (IA) -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mt-6 shadow-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-base">💀</span>
+                    <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Cobrança e Choque da IA</h3>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight mb-3">Está procrastinando ou inventando desculpas? Clique no botão e receba a chamada de autodisciplina do seu Mentor Executivo.</p>
+                <div class="flex gap-2">
+                    <input type="text" id="ai-mentor-excuse" class="flex-1 bg-brandDark border border-brandBorder rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brandRed" placeholder="Digite sua desculpa...">
+                    <button onclick="askMentorAI()" id="btn-ask-mentor" class="px-3 bg-brandRed/15 border border-brandRed/30 hover:bg-brandRed text-brandRed hover:text-white text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1">
+                        <span>Cobrar ⚡</span>
+                        <svg id="mentor-spinner" class="hidden animate-spin h-3.5 w-3.5 text-brandRed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="ai-mentor-result" class="hidden mt-3 p-3 bg-brandDark border border-brandRed/20 rounded-xl">
+                    <p class="text-[11px] text-red-200 leading-relaxed font-medium italic" id="ai-mentor-text"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: AGENDA (SEÇÕES HOJE, SEMANA, MES) ================= -->
+        <section id="tab-agenda" class="tab-content">
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1">
+                        <span>📅 Compromissos do Comando</span>
+                    </h3>
+                    <button onclick="openAgendaModal()" class="text-[10px] bg-brandBlue/10 border border-brandBlue/30 text-brandBlue px-2.5 py-1.5 rounded-xl font-bold active:scale-95 transition-all">+ Novo Evento</button>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight">Organize consultas, viagens e tarefas agendadas em blocos cronológicos estruturados de tempo.</p>
+            </div>
+
+            <!-- CONTAINER DINÂMICO DE SEÇÕES DE AGENDA -->
+            <div class="flex flex-col gap-4 mb-6" id="agenda-sections-container"></div>
+            
+            <!-- COMPROMISSOS CONCLUÍDOS -->
+            <div class="bg-emerald-950/10 border border-emerald-900/30 rounded-2xl p-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-brandGreen mb-3">🏆 Eventos Concluídos</h3>
+                <div class="flex flex-col gap-2.5" id="agenda-completed-container"></div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: DIETA & ÁGUA ================= -->
+        <section id="tab-dieta" class="tab-content">
+            <!-- PAINEL MACRONUTRIENTES -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Combustível Diário</h3>
+                    <div class="flex gap-2">
+                        <button onclick="openGoalSettingsModal()" class="text-[10px] text-brandBlue font-extrabold hover:text-blue-300 flex items-center gap-0.5">⚙ Metas</button>
+                        <button onclick="triggerDietResetConfirm()" class="text-[10px] text-slate-500 font-extrabold hover:text-brandRed">Zerar Consumo</button>
+                    </div>
+                </div>
+                
+                <!-- CALORIAS -->
+                <div class="mb-3.5">
+                    <div class="flex justify-between text-[10px] font-bold mb-1">
+                        <span class="text-brandOrange">Calorias (kcal)</span>
+                        <span class="text-slate-300 font-mono"><span id="cal-current" class="font-extrabold">0</span> / <span id="cal-target">2500</span></span>
+                    </div>
+                    <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder">
+                        <div class="bg-brandOrange h-2.5 rounded-full transition-all duration-500" id="cal-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- PROTEÍNAS -->
+                <div>
+                    <div class="flex justify-between text-[10px] font-bold mb-1">
+                        <span class="text-brandBlue">Proteínas (g)</span>
+                        <span class="text-slate-300 font-mono"><span id="prot-current" class="font-extrabold">0</span> / <span id="prot-target">160</span>g</span>
+                    </div>
+                    <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder">
+                        <div class="bg-brandBlue h-2.5 rounded-full transition-all duration-500" id="prot-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROLE DE HIDRATAÇÃO -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-extrabold text-brandCyan uppercase tracking-wider flex items-center gap-1.5">
+                        <span>💧 Hidratação Executiva</span>
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="triggerWaterResetConfirm()" class="text-[9px] text-slate-500 font-bold hover:text-brandRed">Reset</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                    <div class="bg-brandDark border border-brandBorder p-2 rounded-xl text-center">
+                        <span class="block text-[8px] text-slate-400 font-bold uppercase">Consumo</span>
+                        <strong class="text-sm text-brandCyan font-mono" id="water-current">0ml</strong>
+                    </div>
+                    <div class="bg-brandDark border border-brandBorder p-2 rounded-xl text-center">
+                        <span class="block text-[8px] text-slate-400 font-bold uppercase">Meta</span>
+                        <strong class="text-sm text-slate-300 font-mono" id="water-target">3500ml</strong>
+                    </div>
+                    <div class="bg-brandDark border border-brandBorder p-2 rounded-xl text-center flex items-center justify-center">
+                        <strong class="text-xs text-brandCyan font-extrabold" id="water-percent-txt">0%</strong>
+                    </div>
+                </div>
+                <div class="w-full bg-brandDark rounded-full h-2 border border-brandBorder mb-3">
+                    <div class="bg-brandCyan h-2 rounded-full transition-all duration-500" id="water-bar" style="width: 0%"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="addWater(250)" class="py-1.5 bg-brandDark border border-brandBorder/60 hover:bg-slate-800 text-brandCyan text-[10px] font-extrabold rounded-lg active:scale-95 transition-all">
+                        +250 ml
+                    </button>
+                    <button onclick="addWater(500)" class="py-1.5 bg-brandDark border border-brandBorder/60 hover:bg-slate-800 text-brandCyan text-[10px] font-extrabold rounded-lg active:scale-95 transition-all">
+                        +500 ml
+                    </button>
+                    <button onclick="addWater(1000)" class="py-1.5 bg-brandDark border border-brandBorder/60 hover:bg-slate-800 text-brandCyan text-[10px] font-extrabold rounded-lg active:scale-95 transition-all">
+                        +1.0 L
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONSULTOR NUTRICIONAL (IA) -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
+                <h3 class="text-xs font-extrabold text-brandGreen uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                    <span>🤖 Consultar IA Nutricional</span>
+                </h3>
+                <p class="text-[10px] text-slate-400 mb-2 leading-tight">Descreva o que você comeu e a IA fará os cálculos de macros para você.</p>
+                <div class="flex flex-col gap-2">
+                    <textarea id="ai-diet-prompt" rows="2" class="w-full bg-brandDark border border-brandBorder rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brandBlue resize-none" placeholder="Ex: Comi 150g de filé de frango grelhado com 4 colheres de arroz..."></textarea>
+                    <button onclick="askNutriAI()" id="btn-ask-ai" class="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <span id="ai-btn-text">Analisar Alimento ⚡</span>
+                        <svg id="ai-loading-spinner" class="hidden animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="ai-result-card" class="hidden mt-3 p-3 bg-brandDark border border-brandBorder rounded-xl transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xs font-bold text-white uppercase" id="ai-result-name">Análise</h4>
+                        <span class="text-[9px] text-slate-500 font-mono">Estimativa IA</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="bg-brandCard p-2 rounded-lg text-center border border-brandBorder">
+                            <span class="block text-[9px] text-slate-400">Calorias</span>
+                            <strong class="text-sm text-brandOrange font-mono" id="ai-result-cal">0 kcal</strong>
+                        </div>
+                        <div class="bg-brandCard p-2 rounded-lg text-center border border-brandBorder">
+                            <span class="block text-[9px] text-slate-400">Proteínas</span>
+                            <strong class="text-sm text-brandBlue font-mono" id="ai-result-prot">0g</strong>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-300 leading-normal mb-3" id="ai-result-explanation"></p>
+                    <div class="flex gap-2">
+                        <button onclick="addAIResultToDiet()" class="flex-1 py-1.5 bg-brandGreen text-brandDark font-extrabold text-[11px] rounded-lg transition-all active:scale-95">
+                            Adicionar Hoje +
+                        </button>
+                        <button onclick="saveAIResultAsPreset()" class="flex-1 py-1.5 bg-brandBlue text-white font-bold text-[11px] rounded-lg transition-all active:scale-95">
+                            Salvar Atalho
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <button onclick="openCustomMealModal()" class="flex-1 py-2 bg-brandDark border border-brandBorder rounded-xl text-[10px] font-bold text-slate-300 hover:bg-slate-800 transition-all flex justify-center items-center gap-1 active:scale-95">
+                    <span class="text-sm">🍕</span> Lançar Avulso
+                </button>
+                <button onclick="openPresetManagerModal()" class="flex-1 py-2 bg-brandDark border border-brandBorder rounded-xl text-[10px] font-bold text-slate-300 hover:bg-slate-800 transition-all flex justify-center items-center gap-1 active:scale-95">
+                    <span class="text-sm">⚙️</span> Atalhos
+                </button>
+            </div>
+
+            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Adicionar Rápido</h3>
+            <div class="grid grid-cols-2 gap-2 mb-5" id="diet-presets-container"></div>
+
+            <div class="bg-brandCard/50 border border-brandBorder/50 rounded-2xl p-4">
+                <h3 class="text-[11px] font-bold text-brandGreen uppercase tracking-wider mb-3">Histórico de Hoje</h3>
+                <div class="flex flex-col gap-2" id="diet-consumed-container"></div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: METAS (COM SUBTAREFAS DE FOCO) ================= -->
+        <section id="tab-metas" class="tab-content">
+            <div class="grid grid-cols-3 gap-2 mb-4 bg-brandCard p-1 rounded-xl border border-brandBorder">
+                <button id="sub-btn-curto" onclick="filterMetas('curto')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-white bg-brandBlue active:scale-95">Curto Prazo</button>
+                <button id="sub-btn-medio" onclick="filterMetas('medio')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-slate-400 active:scale-95">Médio Prazo</button>
+                <button id="sub-btn-longo" onclick="filterMetas('longo')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-slate-400 active:scale-95">Longo Prazo</button>
+            </div>
+
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400" id="meta-horizonte-title">A Fazer</h3>
+                    <span class="text-[10px] bg-brandDark px-2 py-0.5 rounded-full font-bold text-brandBlue" id="active-meta-count">0</span>
+                </div>
+                <div class="flex flex-col gap-2.5" id="active-metas-container"></div>
+                <button onclick="openNewMetaModal()" class="w-full mt-3 py-2 border border-dashed border-brandBlue/35 text-brandBlue font-bold text-xs rounded-xl active:scale-[0.98]">
+                    + Adicionar Objetivo
+                </button>
+            </div>
+
+            <div class="bg-emerald-950/10 border border-emerald-900/30 rounded-2xl p-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-brandGreen mb-3">🏆 Concluídos</h3>
+                <div class="flex flex-col gap-2.5" id="completed-metas-container"></div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: CONFIGURAÇÕES ================= -->
+        <section id="tab-config" class="tab-content">
+            
+            <!-- CONFIGURAÇÃO DA IA (NOVO) -->
+            <div class="bg-brandCard border border-brandBlue/30 rounded-2xl p-5 mb-4 shadow-[0_0_15px_rgba(59,130,246,0.15)] relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-brandBlue text-white text-[8px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Segurança</div>
+                <h3 class="text-sm font-bold text-brandBlue mb-2 flex items-center gap-1.5"><span>🤖</span> Chave da IA (Gemini)</h3>
+                <p class="text-[10px] text-slate-400 mb-3 leading-tight">Cole sua API Key aqui para a inteligência funcionar. Ela fica salva <b>apenas no seu celular</b> e o GitHub nunca vai bloqueá-la.</p>
+                <input type="password" id="config-api-key" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs mb-3 focus:outline-none focus:border-brandBlue" placeholder="Cole sua chave gerada no Google AI Studio aqui...">
+                <button onclick="saveApiKey()" class="w-full py-2.5 bg-brandBlue text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Salvar Chave Segura</button>
+            </div>
+
+            <!-- COPIAR PARA WORD -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 text-center shadow-lg">
+                <div class="text-3xl mb-2">📝</div>
+                <h3 class="text-sm font-bold text-slate-200 mb-1">Copiar para Word</h3>
+                <p class="text-[10px] text-slate-400 mb-4">Gera a tabela estruturada com metas e agenda em padrão de impressão de relatórios.</p>
+                <button onclick="copyToWord()" class="w-full py-2.5 bg-brandCard border border-brandBlue text-brandBlue font-bold text-xs rounded-xl uppercase tracking-wide active:scale-95 transition-all">
+                    Copiar Formatação
+                </button>
+            </div>
+
+            <!-- DATA DE INÍCIO DA ESCALA -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 shadow-lg">
+                <h3 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Ajuste da Escala 6x3</h3>
+                <label class="block text-[10px] text-slate-400 mb-1">Data do Dia 1 (Início do ciclo):</label>
+                <input type="date" id="scale-start-input" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs mb-2 focus:outline-none focus:border-brandBlue" onchange="updateScaleDate(this.value)">
+                <p class="text-[9px] text-slate-500">Defina o primeiro dia de trabalho da escala. O app calculará os dias de folga automaticamente.</p>
+            </div>
+
+            <!-- BACKUP E SEGURANÇA -->
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 shadow-lg">
+                <h3 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Nuvem e Backup</h3>
+                <div class="flex flex-col gap-2">
+                    <button onclick="exportBackupData()" class="w-full py-2 bg-brandDark border border-brandBorder text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95">
+                        📥 Exportar Backup
+                    </button>
+                    <label class="w-full py-2 bg-brandDark border border-brandBorder text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                        📤 Importar Backup <input type="file" id="import-file" class="hidden" onchange="importBackupData(event)">
+                    </label>
+                    <button onclick="triggerResetDefaultConfirm()" class="w-full py-2 border border-brandRed/20 hover:bg-red-950/10 text-brandRed font-semibold text-xs rounded-xl mt-2 active:scale-95">
+                        Restaurar Configurações Originais
+                    </button>
+                </div>
+            </div>
+            <div class="text-center text-[10px] text-slate-600">Comando Pessoal V7.0 • Executivo RPG e Gamificado</div>
+        </section>
+    </main>
+
+    <!-- MODAL: CALENDÁRIO -->
+    <div class="modal" id="calendar-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="changeCalendarMonth(-1)" class="text-slate-400 p-2 font-bold hover:text-white">&lt;</button>
+                <h3 class="text-sm font-bold text-white uppercase tracking-widest" id="calendar-month-year">JUNHO 2026</h3>
+                <button onclick="changeCalendarMonth(1)" class="text-slate-400 p-2 font-bold hover:text-white">&gt;</button>
+            </div>
+            <div class="cal-grid mb-2">
+                <div class="cal-header">Dom</div><div class="cal-header">Seg</div><div class="cal-header">Ter</div>
+                <div class="cal-header">Qua</div><div class="cal-header">Qui</div><div class="cal-header">Sex</div><div class="cal-header">Sáb</div>
+            </div>
+            <div class="cal-grid" id="calendar-grid-container"></div>
+            <div class="mt-4 flex gap-3 justify-center text-[10px] font-bold">
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-500/20 border border-blue-500/40"></span> Trabalho</div>
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-green-500/20 border border-green-500/40"></span> Folga</div>
+            </div>
+            <button onclick="closeModal('calendar-modal')" class="w-full mt-5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-brandDark border border-brandBorder active:scale-95">Fechar Calendário</button>
+        </div>
+    </div>
+
+    <!-- MODAL: METAS NUTRICIONAIS -->
+    <div class="modal" id="goal-settings-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-sm font-bold text-white mb-4">⚙️ Metas Diárias</h3>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Meta de Calorias (kcal)</label>
+                <input type="number" id="goal-modal-cal" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 2500">
+            </div>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Meta de Proteínas (g)</label>
+                <input type="number" id="goal-modal-prot" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 160">
+            </div>
+            <div class="mb-4">
+                <label class="block text-[10px] text-slate-400 mb-1">Meta de Água (ml)</label>
+                <input type="number" id="goal-modal-water" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 3500">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('goal-settings-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
+                <button onclick="saveGoalSettings()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandBlue active:scale-95">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVA/EDITAR TAREFA -->
+    <div class="modal" id="task-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-sm font-bold text-white mb-4" id="task-modal-title">Nova Tarefa</h3>
+            <input type="hidden" id="task-modal-id">
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Horário Visível</label>
+                <input type="text" id="task-modal-time" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" placeholder="Ex: 15:00 - 16:30">
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Início Numérico</label>
+                    <input type="number" id="task-modal-start" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" placeholder="Ex: 1500">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Fim Numérico</label>
+                    <input type="number" id="task-modal-end" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" placeholder="Ex: 1630">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-[10px] text-slate-400 mb-1">Descrição</label>
+                <textarea id="task-modal-text" rows="2" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs"></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('task-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
+                <button onclick="saveTaskModal()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandBlue active:scale-95">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVA META -->
+    <div class="modal" id="new-meta-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-sm font-bold text-white mb-4">🎯 Adicionar Novo Objetivo</h3>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">O que você planeja alcançar?</label>
+                <textarea id="new-meta-text-input" rows="3" class="w-full bg-brandDark border border-brandBorder rounded-lg p-3 text-white text-xs focus:outline-none focus:border-brandBlue" placeholder="Ex: Garantir o bloco mínimo no Descomplica..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-[10px] text-slate-400 mb-1">Subtarefas táticas (separadas por vírgula, opcional)</label>
+                <input type="text" id="new-meta-subtasks-input" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Baixar provas, Fazer simulado">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('new-meta-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
+                <button onclick="saveNewMetaFromModal()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandBlue active:scale-95">Salvar Meta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REFEIÇÃO AVULSA -->
+    <div class="modal" id="custom-meal-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-sm font-bold text-white mb-4">Adicionar Refeição Avulsa</h3>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Nome da Comida</label>
+                <input type="text" id="custom-meal-name" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 2 Pedaços de Pizza">
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Calorias (kcal)</label>
+                    <input type="number" id="custom-meal-cal" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 600">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Proteínas (g)</label>
+                    <input type="number" id="custom-meal-prot" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 15">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('custom-meal-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
+                <button onclick="saveCustomMeal()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandOrange active:scale-95">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GERENCIAR PRESETS -->
+    <div class="modal" id="preset-manager-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm flex flex-col shadow-2xl" style="max-height: 85vh;">
+            <h3 class="text-sm font-bold text-white mb-3">Gerenciar Botões Rápidos</h3>
+            <div class="flex-1 overflow-y-auto custom-scroll pr-1 mb-4 border border-brandBorder rounded-lg bg-brandDark p-2 flex flex-col gap-2" id="preset-list-container"></div>
+            <div class="bg-brandDark border border-brandBorder p-3 rounded-xl">
+                <h4 class="text-[10px] font-bold text-brandBlue mb-2 uppercase">Criar Novo Botão</h4>
+                <input type="text" id="new-preset-name" class="w-full bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs mb-2 focus:outline-none focus:border-brandBlue" placeholder="Nome (Ex: Pão de Queijo)">
+                <div class="flex gap-2 mb-2">
+                    <input type="number" id="new-preset-cal" class="w-1/2 bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Calorias">
+                    <input type="number" id="new-preset-prot" class="w-1/2 bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Proteínas (g)">
+                </div>
+                <button onclick="saveNewPreset()" class="w-full py-2 bg-brandBlue text-white font-bold text-xs rounded-lg active:scale-95">Salvar Novo Botão</button>
+            </div>
+            <button onclick="closeModal('preset-manager-modal')" class="w-full mt-3 px-4 py-2 rounded-lg text-xs font-bold text-slate-300 bg-brandDark border border-brandBorder active:scale-95">Fechar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVO COMPROMISSO (AGENDA) -->
+    <div class="modal" id="agenda-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-sm font-bold text-white mb-4">📅 Novo Compromisso</h3>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Título do Evento</label>
+                <input type="text" id="agenda-title" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Casamento do meu irmão">
+            </div>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Data</label>
+                <input type="date" id="agenda-date" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none">
+            </div>
+            <div class="mb-3">
+                <label class="block text-[10px] text-slate-400 mb-1">Categoria</label>
+                <select id="agenda-category" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none">
+                    <option value="Pessoal">Pessoal 🙋‍♂️</option>
+                    <option value="Saúde">Saúde 🩺</option>
+                    <option value="Financeiro">Financeiro 💸</option>
+                    <option value="Trabalho">Trabalho 🏢</option>
+                    <option value="Estudo">Estudo 📚</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-[10px] text-slate-400 mb-1">Subtarefas iniciais (separadas por vírgula)</label>
+                <input type="text" id="agenda-subtasks" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Comprar terno, Comprar presente">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('agenda-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
+                <button onclick="saveAgendaItem()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandBlue active:scale-95">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TABELA DE TIERS/RANKS (NEW!) -->
+    <div class="modal" id="ranks-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm flex flex-col shadow-2xl" style="max-height: 85vh;">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-1.5">
+                    <span>🏆 Tiers de Autodisciplina</span>
+                </h3>
+            </div>
+            <p class="text-[10px] text-slate-400 mb-4 leading-tight">Suba de nível completando obrigações, hábitos diários e prazos na sua agenda para evoluir sua patente de comando!</p>
+            
+            <!-- Lista Dinâmica de Tiers -->
+            <div class="flex-1 overflow-y-auto custom-scroll pr-1 mb-4 flex flex-col gap-2.5" id="ranks-list-container"></div>
+            
+            <button onclick="closeModal('ranks-modal')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-brandDark border border-brandBorder active:scale-95">Fechar Painel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: ADICIONAR SUBTAREFA (META OU AGENDA) -->
+    <div class="modal" id="add-subtask-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-sm font-bold text-white mb-4">➕ Adicionar Etapa</h3>
+            <div class="mb-4">
+                <label class="block text-[10px] text-slate-400 mb-1">Descreva o passo/ação</label>
+                <input type="text" id="subtask-modal-text" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brandBlue" placeholder="Ex: Baixar provas do Enem" onkeydown="if(event.key==='Enter'){saveSubtaskModal();}">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('add-subtask-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
+                <button onclick="saveSubtaskModal()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandBlue active:scale-95">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO (SEM BROWSER ALERTS) -->
+    <div class="modal" id="confirm-modal">
+        <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm text-center shadow-2xl">
+            <div class="text-3xl mb-2">⚠️</div>
+            <h3 class="text-sm font-bold text-white mb-2">Ação Irreversível</h3>
+            <p class="text-xs text-slate-400 mb-5" id="confirm-modal-description">Deseja realmente realizar esta ação?</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeModal('confirm-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark w-24 active:scale-95">Não</button>
+                <button id="confirm-modal-ok-btn" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandRed w-24 active:scale-95">Sim</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT PRINCIPAL -->
+    <script>
+        // ================= DADOS E ESTADO DA CENTRAL =================
+        const defaultRoutines = {
+            A: [
+                { id: 1, time: "05:00 - 05:30", start: 500, end: 530, text: "Acordar, Higiene, Café (2 Fatias, Queijo, Leite), Creatina.", done: false },
+                { id: 2, time: "06:00 - 15:00", start: 600, end: 1500, text: "Foco Profissional CPFL.", done: false },
+                { id: 3, time: "15:10 - 15:50", start: 1510, end: 1550, text: "Deslocamento Fz15 p/ Valinhos.", done: false },
+                { id: 4, time: "16:20 - 18:00", start: 1620, end: 1800, text: "Treino Pesado + Cardio (Esporte Side).", done: false },
+                { id: 5, time: "18:30 - 19:00", start: 1830, end: 1900, text: "Banho & Janta da Dieta (Marmita da Mãe).", done: false },
+                { id: 6, time: "19:00 - 19:05", start: 1900, end: 1905, text: "Manutenção Ofensiva Duolingo.", done: false },
+                { id: 7, time: "19:05 - 20:00", start: 1905, end: 2000, text: "Estudos Descomplica (Mackenzie).", done: false },
+                { id: 8, time: "20:00 - 22:30", start: 2000, end: 2230, text: "Lazer Livre (PC Gamer / Projetor).", done: false }
+            ],
+            B: [
+                { id: 11, time: "05:00 - 05:30", start: 500, end: 530, text: "Acordar, Higiene, Café, Creatina.", done: false },
+                { id: 12, time: "06:00 - 15:00", start: 600, end: 1500, text: "Foco Profissional CPFL.", done: false },
+                { id: 13, time: "15:10 - 15:50", start: 1510, end: 1550, text: "Deslocamento Fz15 p/ Valinhos.", done: false },
+                { id: 14, time: "16:00 - 17:30", start: 1600, end: 1730, text: "Estudo Avançado (Descomplica Extra).", done: false },
+                { id: 15, time: "18:00 - 23:00", start: 1800, end: 2300, text: "Lazer de Fim de Semana (Taquaral / PC Gamer).", done: false }
+            ],
+            C: [
+                { id: 21, time: "07:00 - 08:30", start: 700, end: 830, text: "Acordar S/ Despertador + Café Reforçado.", done: false },
+                { id: 22, time: "08:30 - 11:30", start: 830, end: 1130, text: "Bico de Elétrica ou Estudo Pesado.", done: false },
+                { id: 23, time: "11:30 - 13:00", start: 1130, end: 1300, text: "Almoço Dieta.", done: false },
+                { id: 24, time: "13:00 - 15:00", start: 1300, end: 1500, text: "Revisão Descomplica.", done: false },
+                { id: 25, time: "15:30 - 17:00", start: 1530, end: 1700, text: "Treino Pesado (Horário Nobre Vazio).", done: false },
+                { id: 26, time: "18:00 - 23:00", start: 1800, end: 2300, text: "Descanso / PC Gamer.", done: false }
+            ],
+            D: [
+                { id: 31, time: "08:00 - 10:00", start: 800, end: 1000, text: "Acordar tranquilo, Café padrão.", done: false },
+                { id: 32, time: "10:00 - 14:00", start: 1000, end: 1400, text: "Lazer matinal / Almoço Livre.", done: false },
+                { id: 33, time: "14:00 - 16:00", start: 1400, end: 1600, text: "Manutenção Vida (Compras, organizar quarto).", done: false },
+                { id: 34, time: "16:00 - 24:00", start: 1600, end: 2400, text: "Respiro Total, Água de Coco no Taquaral, Jogos.", done: false }
+            ]
+        };
+
+        const defaultDietPresets = [
+            { id: 1, name: '🍞 Café Padrão (Pão, Queijo, Leite c/ Café)', cal: 350, prot: 18 },
+            { id: 2, name: '🍛 Almoço Marmita (Frango, Arroz, Salada)', cal: 600, prot: 45 },
+            { id: 3, name: '🥛 Pré/Pós Treino (Whey + Fruta)', cal: 220, prot: 25 },
+            { id: 4, name: '🍲 Janta Dieta (Carne, Carbo, Legume)', cal: 550, prot: 40 },
+            { id: 5, name: '🍳 Ovos Mexidos (3 ovos)', cal: 210, prot: 18 }
+        ];
+
+        let appState = {
+            scaleStartDate: '2026-06-07',
+            currentMode: 'A',
+            lastResetDate: '',
+            selectedMetaTab: 'curto',
+            geminiApiKey: '', // NOVA VARIÁVEL PARA SALVAR A CHAVE
+            routines: JSON.parse(JSON.stringify(defaultRoutines)),
+            diet: { 
+                targetCal: 2500, 
+                targetProt: 160, 
+                presets: [...defaultDietPresets], 
+                consumed: [],
+                waterTarget: 3500,
+                waterConsumed: 0
+            },
+            metas: [
+                { id: 1, type: 'curto', text: 'Garantir o bloco mínimo no Descomplica com foco no Enem.', done: false, subtasks: [] },
+                { id: 2, type: 'curto', text: 'Preservar a ofensiva de mais de 1.200 dias no Duolingo.', done: false, subtasks: [] },
+                { id: 3, type: 'curto', text: 'Operar estritamente na janela matinal (até 11h40) na CPFL.', done: false, subtasks: [] },
+                { id: 4, type: 'medio', text: 'Prestar o Enem em Novembro de 2026.', done: false, subtasks: [] },
+                { id: 5, type: 'medio', text: 'Retornar operacional do trade com 2 contratos.', done: false, subtasks: [] },
+                { id: 6, type: 'medio', text: 'Quitar integralmente cartões de crédito Nubank e Itaú.', done: false, subtasks: [] },
+                { id: 7, type: 'longo', text: 'Concluir bacharelado em Administração na Mackenzie (2030/2031).', done: false, subtasks: [] },
+                { id: 8, type: 'longo', text: 'Atingir o patamar estável de R$ 10.000 alocados no Trade.', done: false, subtasks: [] },
+                { id: 9, type: 'longo', text: 'Consolidar o percentual de gordura ideal para a definição estrita do abdômen.', done: false, subtasks: [] }
+            ],
+            agenda: [
+                { id: 101, title: "Casamento do meu irmão (comprar terno e presente)", date: "2026-07-20", category: "Pessoal", done: false, subtasks: [{ id: 1001, text: "Comprar terno de padrinho", done: false }, { id: 1002, text: "Pesquisar presentes de casamento", done: false }] },
+                { id: 102, title: "Consulta médica de rotina", date: "2026-06-30", category: "Saúde", done: false, subtasks: [] }
+            ],
+            // Gamificação RPG
+            xp: 0,
+            level: 1,
+            streak: 0,
+            freezes: 0
+        };
+
+        let lastAIResult = null;
+        let currentCalendarDate = new Date();
+        let subtaskModalContext = { type: null, id: null };
+
+        // ================= ARMAZENAMENTO SEGURO (FALLBACK PARA IFRAMES/PREVIEWS BLOQUEADOS) =================
+        const memoryStorage = {};
+        const safeStorage = {
+            getItem(key) {
+                try {
+                    return localStorage.getItem(key);
+                } catch (e) {
+                    return memoryStorage[key] !== undefined ? memoryStorage[key] : null;
+                }
+            },
+            setItem(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    memoryStorage[key] = value;
+                }
+            },
+            removeItem(key) {
+                try {
+                    localStorage.removeItem(key);
+                } catch (e) {
+                    delete memoryStorage[key];
+                }
+            }
+        };
+
+        // ================= FUNÇÃO DA CHAVE DA IA =================
+        function saveApiKey() {
+            const keyInput = document.getElementById('config-api-key').value.trim();
+            if (!keyInput) {
+                showToast("Cole uma chave antes de salvar.");
+                return;
+            }
+            appState.geminiApiKey = keyInput;
+            saveToStorage();
+            showToast("Chave da IA salva com sucesso! 🤖");
+        }
+
+        // ================= MODAL UNIFICADO DE SUBTAREFAS (META OU AGENDA) =================
+        function openSubtaskModal(type, id) {
+            subtaskModalContext = { type, id };
+            document.getElementById('subtask-modal-text').value = '';
+            document.getElementById('add-subtask-modal').classList.add('active');
+            setTimeout(() => document.getElementById('subtask-modal-text').focus(), 100);
+        }
+
+        function saveSubtaskModal() {
+            const text = document.getElementById('subtask-modal-text').value.trim();
+            if (!text) {
+                showToast("Digite uma descrição para a etapa.");
+                return;
+            }
+
+            const { type, id } = subtaskModalContext;
+
+            if (type === 'meta') {
+                const meta = appState.metas.find(x => x.id === id);
+                if (meta) {
+                    if (!meta.subtasks) meta.subtasks = [];
+                    meta.subtasks.push({ id: Date.now(), text, done: false });
+                    saveToStorage();
+                    renderMetas();
+                    showToast("Etapa adicionada ao objetivo!");
+                }
+            } else if (type === 'agenda') {
+                const item = appState.agenda.find(x => x.id === id);
+                if (item) {
+                    if (!item.subtasks) item.subtasks = [];
+                    item.subtasks.push({ id: Date.now(), text, done: false });
+                    saveToStorage();
+                    renderAgenda();
+                    showToast("Passo adicionado ao compromisso!");
+                }
+            }
+
+            closeModal('add-subtask-modal');
+        }
+
+        // ================= SISTEMA DE XP, NÍVEL E TÍTULOS (GAMIFICAÇÃO) =================
+        function getRank(lvl) {
+            if (lvl >= 35) return { title: "Avatar Mítico 🌌", color: "text-brandPurple font-black" };
+            if (lvl >= 30) return { title: "Lenda Suprema 👑", color: "text-brandPurple font-bold" };
+            if (lvl >= 25) return { title: "Guerreiro Épico 🌀", color: "text-brandCyan font-bold" };
+            if (lvl >= 20) return { title: "Comandante de Elite 🎖️", color: "text-brandBlue font-bold" };
+            if (lvl >= 15) return { title: "Guerreiro Implacável 🔥", color: "text-brandOrange font-bold" };
+            if (lvl >= 10) return { title: "Combatente de Aço ⚔️", color: "text-brandGreen font-bold" };
+            if (lvl >= 5) return { title: "Iniciado Disciplinado ⚡", color: "text-slate-300 font-bold" };
+            return { title: "Recruta Neófito 🛡️", color: "text-slate-400 font-medium" };
+        }
+
+        const rpgTiersList = [
+            { minLvl: 1, maxLvl: 4, name: "Recruta Neófito 🛡️", color: "text-slate-400", bg: "bg-slate-900/40" },
+            { minLvl: 5, maxLvl: 9, name: "Iniciado Disciplinado ⚡", color: "text-slate-300", bg: "bg-slate-800/40" },
+            { minLvl: 10, maxLvl: 14, name: "Combatente de Aço ⚔️", color: "text-brandGreen", bg: "bg-emerald-950/20" },
+            { minLvl: 15, maxLvl: 19, name: "Guerreiro Implacável 🔥", color: "text-brandOrange", bg: "bg-amber-950/20" },
+            { minLvl: 20, maxLvl: 24, name: "Comandante de Elite 🎖️", color: "text-brandBlue", bg: "bg-blue-950/20" },
+            { minLvl: 25, maxLvl: 29, name: "Guerreiro Épico 🌀", color: "text-brandCyan", bg: "bg-cyan-950/20" },
+            { minLvl: 30, maxLvl: 34, name: "Lenda Suprema 👑", color: "text-brandPurple", bg: "bg-purple-950/20" },
+            { minLvl: 35, maxLvl: 999, name: "Avatar Mítico 🌌", color: "text-brandPurple font-black", bg: "bg-gradient-to-r from-purple-950/30 to-blue-950/30" }
+        ];
+
+        function addXP(amount) {
+            if (appState.xp === undefined) appState.xp = 0;
+            if (appState.level === undefined) appState.level = 1;
+
+            appState.xp += amount;
+            if (appState.xp < 0) appState.xp = 0;
+
+            let xpNeeded = appState.level * 100;
+            let leveledUp = false;
+
+            while (appState.xp >= xpNeeded) {
+                appState.xp -= xpNeeded;
+                appState.level++;
+                xpNeeded = appState.level * 100;
+                leveledUp = true;
+            }
+
+            if (leveledUp) {
+                const rank = getRank(appState.level);
+                showToast(`🚀 NOVO NÍVEL ALCANÇADO: Nível ${appState.level} (${rank.title})!`);
+            }
+            saveToStorage();
+            renderGamification();
+        }
+
+        function renderGamification() {
+            const level = appState.level || 1;
+            const xp = appState.xp || 0;
+            const streak = appState.streak || 0;
+            const freezes = appState.freezes || 0;
+            const rank = getRank(level);
+            const xpNeeded = level * 100;
+            const xpPercent = Math.min((xp / xpNeeded) * 100, 100);
+
+            const levelEl = document.getElementById("rpg-level");
+            const rankEl = document.getElementById("rpg-rank");
+            const streakEl = document.getElementById("rpg-streak");
+            const freezesEl = document.getElementById("rpg-freezes");
+            const xpBarEl = document.getElementById("rpg-xp-bar");
+            const xpTextEl = document.getElementById("rpg-xp-text");
+
+            if (levelEl) levelEl.innerText = `Nível ${level}`;
+            if (rankEl) {
+                rankEl.innerText = rank.title;
+                rankEl.className = `text-[10px] uppercase font-black tracking-wide ${rank.color}`;
+            }
+            if (streakEl) streakEl.innerText = `${streak}d`;
+            if (freezesEl) freezesEl.innerText = `${freezes}/3`;
+            if (xpBarEl) xpBarEl.style.width = `${xpPercent}%`;
+            if (xpTextEl) xpTextEl.innerText = `${xp} / ${xpNeeded} XP`;
+        }
+
+        function openRanksModal() {
+            const container = document.getElementById('ranks-list-container');
+            if(!container) return;
+            container.innerHTML = "";
+            
+            const currentLvl = appState.level || 1;
+
+            rpgTiersList.forEach(t => {
+                let statusBadge = "";
+                let isCurrent = currentLvl >= t.minLvl && currentLvl <= t.maxLvl;
+                let isUnlocked = currentLvl >= t.minLvl;
+                let opacityClass = isUnlocked ? "opacity-100" : "opacity-45";
+                let borderClass = isCurrent ? "border-brandBlue/70 shadow-lg shadow-brandBlue/10 bg-brandDark" : "border-brandBorder";
+                
+                if (isCurrent) {
+                    statusBadge = `<span class="text-[8px] font-black uppercase text-brandBlue bg-brandBlue/10 border border-brandBlue/30 px-2 py-0.5 rounded-full">Atual</span>`;
+                } else if (isUnlocked) {
+                    statusBadge = `<span class="text-[8px] font-bold text-brandGreen">Liberado ✓</span>`;
+                } else {
+                    statusBadge = `<span class="text-[8px] font-bold text-slate-500">Nível ${t.minLvl} 🔒</span>`;
+                }
+
+                const lvlRangeText = t.maxLvl === 999 ? `Nível ${t.minLvl}+` : `Nível ${t.minLvl} - ${t.maxLvl}`;
+
+                const div = document.createElement('div');
+                div.className = `flex flex-col p-3.5 rounded-xl border ${borderClass} ${t.bg} ${opacityClass} transition-all`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex flex-col">
+                            <strong class="text-xs ${t.color}">${t.name}</strong>
+                            <span class="text-[9px] font-mono text-slate-400 mt-0.5">${lvlRangeText}</span>
+                        </div>
+                        <div>${statusBadge}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('ranks-modal').classList.add('active');
+        }
+
+        function buyFreeze() {
+            const level = appState.level || 1;
+            const xp = appState.xp || 0;
+            const freezes = appState.freezes || 0;
+
+            if (freezes >= 3) {
+                showToast("❄️ Limite máximo de 3 Gelinhos atingido!");
+                return;
+            }
+
+            const totalXPPool = xp + ((level - 1) * 100);
+            if (totalXPPool >= 200) {
+                appState.xp -= 200;
+                while (appState.xp < 0 && appState.level > 1) {
+                    appState.level--;
+                    appState.xp += appState.level * 100;
+                }
+                if (appState.xp < 0) appState.xp = 0;
+                
+                appState.freezes = freezes + 1;
+                saveToStorage();
+                renderAll();
+                showToast("❄️ Gelinho Adquirido! Sequência protegida.");
+            } else {
+                showToast("⚠️ XP Insuficiente! Você precisa de pelo menos 200 XP acumulados.");
+            }
+        }
+
+        // ================= INICIALIZAÇÃO DE DADOS =================
+        window.onload = function() {
+            try {
+                if(safeStorage.getItem('planner_v7_rpg')) {
+                    const saved = JSON.parse(safeStorage.getItem('planner_v7_rpg'));
+                    appState = { ...appState, ...saved };
+                } else if (safeStorage.getItem('planner_v6_ai')) {
+                    const saved = JSON.parse(safeStorage.getItem('planner_v6_ai'));
+                    appState = { ...appState, ...saved };
+                    delete appState.finances;
+                    saveToStorage();
+                }
+            } catch (e) {
+                console.warn('Não foi possível carregar dados salvos, iniciando com padrões:', e);
+            }
+            
+            appState.metas.forEach(m => {
+                if (!m.subtasks) m.subtasks = [];
+            });
+            if (appState.xp === undefined) appState.xp = 0;
+            if (appState.level === undefined) appState.level = 1;
+            if (appState.streak === undefined) appState.streak = 0;
+            if (appState.freezes === undefined) appState.freezes = 0;
+            if (appState.geminiApiKey === undefined) appState.geminiApiKey = '';
+
+            checkDailyReset();
+            document.getElementById('scale-start-input').value = appState.scaleStartDate;
+            document.getElementById('config-api-key').value = appState.geminiApiKey; // Preenche o campo da chave se já existir
+            
+            calculateScale();
+            renderAll();
+            setInterval(updateClockAndRoutine, 1000);
+
+            // Comentado temporariamente para evitar erros ao subir online sem o arquivo
+            /*
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js').catch(() => {
+                    console.warn('Service worker não pôde ser registrado.');
+                });
+            }
+            */
+        };
+
+        function saveToStorage() { 
+            safeStorage.setItem('planner_v7_rpg', JSON.stringify(appState)); 
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            if (!t) return; 
+            t.innerText = msg; t.className = "show";
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 4000);
+        }
+
+        function closeModal(id) { 
+            document.getElementById(id).classList.remove('active'); 
+        }
+
+        function renderAll() {
+            renderGamification();
+            renderRoutine();
+            renderDiet();
+            renderMetas();
+            renderAgenda();
+        }
+
+        // ================= CONFIRMAÇÃO EMBUTIDA (CUSTOM MODAL) =================
+        function triggerConfirm(msg, onOk) {
+            document.getElementById('confirm-modal-description').innerText = msg;
+            const btn = document.getElementById('confirm-modal-ok-btn');
+            btn.onclick = function() {
+                onOk();
+                closeModal('confirm-modal');
+            };
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        // ================= RESET DIÁRIO INTELIGENTE COM GELINHO =================
+        function checkDailyReset() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const todayStr = today.toISOString().split('T')[0];
+            
+            if (appState.lastResetDate !== todayStr) {
+                if (appState.lastResetDate) {
+                    const lastDate = new Date(appState.lastResetDate + 'T00:00:00');
+                    lastDate.setHours(0,0,0,0);
+                    const diffTime = today - lastDate;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays >= 1) {
+                        const activeMode = appState.currentMode;
+                        const tasks = appState.routines[activeMode] || [];
+                        const total = tasks.length;
+                        const completed = tasks.filter(t => t.done).length;
+                        
+                        let isLastDayPerfect = total > 0 && completed === total;
+                        let missedDays = diffDays - 1;
+                        
+                        if (isLastDayPerfect) {
+                            appState.streak = (appState.streak || 0) + 1;
+                            addXP(100); 
+                            showToast(`🔥 Sequência mantida! ${appState.streak} dias perfeitos de Comando! +100 XP!`);
+                            
+                            if (appState.streak % 10 === 0) {
+                                appState.freezes = Math.min((appState.freezes || 0) + 1, 3);
+                                showToast("❄️ Conquista Lendária! Você desbloqueou 1 Gelinho!");
+                            }
+                        } else {
+                            missedDays += 1; 
+                        }
+                        
+                        while (missedDays > 0) {
+                            if (appState.freezes && appState.freezes > 0) {
+                                appState.freezes--;
+                                missedDays--;
+                                showToast("❄️ Gelinho Consumido! A sequência de constância foi salva.");
+                            } else {
+                                appState.streak = 0;
+                                showToast("⚠️ Sequência de constância quebrada! Recomece os hábitos.");
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                Object.keys(appState.routines).forEach(mode => { 
+                    appState.routines[mode].forEach(t => t.done = false); 
+                });
+                appState.diet.consumed = [];
+                appState.diet.waterConsumed = 0;
+                appState.lastResetDate = todayStr;
+                saveToStorage(); 
+                renderAll();
+            }
+        }
+
+        // ================= ESCALA 6x3 OPERACIONAL =================
+        function getCycleDayInfo(dateToCheck) {
+            const startStr = appState.scaleStartDate + 'T00:00:00';
+            const startDate = new Date(startStr);
+            startDate.setHours(0,0,0,0);
+            const check = new Date(dateToCheck.getFullYear(), dateToCheck.getMonth(), dateToCheck.getDate());
+            const diffTime = check - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            let cycleDay = 1;
+            if (diffDays >= 0) {
+                cycleDay = (diffDays % 9) + 1;
+            } else {
+                cycleDay = 9 - (Math.abs(diffDays) % 9);
+                if (cycleDay === 9 && (Math.abs(diffDays) % 9) === 0) cycleDay = 1;
+            }
+            return { dayOfCycle: cycleDay, isWork: cycleDay <= 6 };
+        }
+
+        function updateScaleDate(val) {
+            if(val) { 
+                appState.scaleStartDate = val; 
+                saveToStorage(); 
+                calculateScale(); 
+                renderCalendar();
+            }
+        }
+
+        function calculateScale() {
+            const today = new Date();
+            const info = getCycleDayInfo(today);
+            const isWeekend = today.getDay() === 0 || today.getDay() === 6;
+            let icon = info.isWork ? '🏢' : '🌴';
+            
+            let daysRemaining = info.isWork ? (6 - info.dayOfCycle + 1) : (9 - info.dayOfCycle + 1);
+            let stateName = info.isWork ? 'Trabalho' : 'Folga';
+            let txt = `Dia ${info.dayOfCycle} de 9 (${stateName} - Restam ${daysRemaining}d)`;
+            
+            document.getElementById('scale-status-text').innerText = txt;
+            document.getElementById('scale-icon').innerText = icon;
+
+            let suggestedMode = 'A';
+            if (info.isWork && !isWeekend) suggestedMode = 'A';
+            else if (info.isWork && isWeekend) suggestedMode = 'B';
+            else if (!info.isWork && !isWeekend) suggestedMode = 'C';
+            else if (!info.isWork && isWeekend) suggestedMode = 'D';
+
+            if(sessionStorage.getItem('last_scale_day') != info.dayOfCycle) {
+                switchMode(suggestedMode);
+                sessionStorage.setItem('last_scale_day', info.dayOfCycle);
+            }
+        }
+
+        function openCalendarModal() {
+            currentCalendarDate = new Date();
+            renderCalendar();
+            document.getElementById('calendar-modal').classList.add('active');
+        }
+
+        function changeCalendarMonth(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const today = new Date();
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const container = document.getElementById('calendar-grid-container');
+            container.innerHTML = "";
+
+            for (let i = 0; i < firstDay; i++) {
+                container.innerHTML += `<div class="cal-cell"></div>`;
+            }
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cellDate = new Date(year, month, day);
+                const info = getCycleDayInfo(cellDate);
+                let isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                let classType = info.isWork ? 'cal-work' : 'cal-free';
+                let todayClass = isToday ? 'cal-today' : '';
+                container.innerHTML += `<div class="cal-cell ${classType} ${todayClass}">${day}</div>`;
+            }
+        }
+
+        // ================= MULTIPÁGINA (TABS) =================
+        function openTab(evt, tabId) {
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".tab-link").forEach(el => el.classList.remove("active-tab-btn"));
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active-tab-btn");
+            evt.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        function updateClockAndRoutine() {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('pt-BR');
+            const currentFormattedTime = (now.getHours() * 100) + now.getMinutes();
+            const currentTasks = appState.routines[appState.currentMode] || [];
+            
+            currentTasks.forEach((task) => {
+                const el = document.getElementById(`task-card-${task.id}`);
+                if (el) {
+                    const isActive = (currentFormattedTime >= task.start && currentFormattedTime < task.end);
+                    const hasPulse = el.classList.contains('active-task-pulse');
+                    if (isActive && !hasPulse) renderRoutine();
+                    if (!isActive && hasPulse) renderRoutine();
+                }
+            });
+        }
+
+        // ================= MOTOR DE ROTINA & GAMEFICAÇÃO =================
+        function switchMode(mode) {
+            appState.currentMode = mode;
+            document.querySelectorAll('[id^="btn-mode-"]').forEach(btn => {
+                btn.className = "py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95";
+            });
+            const activeBtn = document.getElementById(`btn-mode-${mode}`);
+            if (activeBtn) {
+                activeBtn.className = "py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandBlue text-white flex flex-col items-center justify-center active:scale-95";
+            }
+            
+            const titles = { A: '[A] CLT + Treino', B: '[B] CLT s/ Treino', C: '[C] Folga + Treino', D: '[D] Folga Total' };
+            const titleDisplay = document.getElementById('routine-title-display');
+            if (titleDisplay) {
+                titleDisplay.innerText = `Modelo ${titles[mode]}`;
+            }
+            saveToStorage(); 
+            renderRoutine();
+        }
+
+        function renderRoutine() {
+            const container = document.getElementById('routine-tasks-container');
+            if (!container) return;
+            container.innerHTML = "";
+            let tasks = appState.routines[appState.currentMode] || [];
+            tasks.sort((a,b) => a.start - b.start);
+            const now = new Date();
+            const currentFormattedTime = (now.getHours() * 100) + now.getMinutes();
+
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(t => t.done).length;
+            const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            const progressPercentEl = document.getElementById('routine-progress-percent');
+            const progressBarEl = document.getElementById('routine-progress-bar');
+            const motivationalTextEl = document.getElementById('routine-motivational-text');
+
+            if (progressPercentEl) progressPercentEl.innerText = `${progressPercent}% Concluído`;
+            if (progressBarEl) progressBarEl.style.width = `${progressPercent}%`;
+
+            let motTxt = "Execute a primeira tarefa para engrenar!";
+            if (progressPercent > 0 && progressPercent < 40) motTxt = "Começo sólido! Continue empurrando! ⚡";
+            else if (progressPercent >= 40 && progressPercent < 80) motTxt = "Mais da metade abatido! Sem quebras de padrão! ⚔️";
+            else if (progressPercent >= 80 && progressPercent < 100) motTxt = "Falta muito pouco para o dia perfeito! Foco total! 🏆";
+            else if (progressPercent === 100) motTxt = "Dia perfeito concluído! Padrão de elite atingido! 🔥";
+            if (motivationalTextEl) motivationalTextEl.innerText = motTxt;
+
+            if(tasks.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-4">Nenhuma tarefa nesta rotina.</p>`; 
+                return;
+            }
+
+            tasks.forEach(task => {
+                const isActive = (currentFormattedTime >= task.start && currentFormattedTime < task.end);
+                const card = document.createElement('div');
+                card.id = `task-card-${task.id}`;
+                card.className = `flex items-center gap-3 bg-brandCard border border-brandBorder rounded-xl p-3.5 transition-all ${isActive ? 'active-task-pulse scale-[1.01]' : ''} ${task.done ? 'opacity-40' : ''}`;
+                card.innerHTML = `
+                    <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTaskDone(${task.id})">
+                    <div class="flex-1">
+                        <span class="text-[9px] font-extrabold ${isActive ? 'text-brandGreen' : 'text-slate-400'}">${task.time}</span>
+                        <p class="text-[11px] leading-tight mt-0.5 ${task.done ? 'task-done-text' : 'text-slate-200 font-bold'}">${task.text}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="openTaskModal(${task.id})" class="text-[9px] text-brandBlue font-bold bg-blue-900/20 px-2 py-1 rounded">Edit</button>
+                        <button onclick="triggerTaskDeleteConfirm(${task.id})" class="text-[9px] text-brandRed font-bold bg-red-900/20 px-2 py-1 rounded">Del</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleTaskDone(id) {
+            const t = appState.routines[appState.currentMode].find(x => x.id === id);
+            if(t) { 
+                t.done = !t.done; 
+                if (t.done) addXP(10);
+                else addXP(-10);
+                saveToStorage(); 
+                renderRoutine(); 
+            }
+        }
+
+        // ================= COMPROMISSOS (AGENDA CRONOLÓGICA) =================
+        function calculateDaysRemaining(dateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const target = new Date(dateStr + 'T00:00:00');
+            target.setHours(0, 0, 0, 0);
+            const diffTime = target - today;
+            return Math.round(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        function formatDateString(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function openAgendaModal() {
+            document.getElementById('agenda-title').value = '';
+            document.getElementById('agenda-date').value = '';
+            document.getElementById('agenda-category').value = 'Pessoal';
+            document.getElementById('agenda-subtasks').value = '';
+            document.getElementById('agenda-modal').classList.add('active');
+        }
+
+        function saveAgendaItem() {
+            const title = document.getElementById('agenda-title').value.trim();
+            const date = document.getElementById('agenda-date').value;
+            const category = document.getElementById('agenda-category').value;
+            const subtasksRaw = document.getElementById('agenda-subtasks').value.trim();
+
+            if (!title || !date) {
+                showToast("Erro: Preencha pelo menos o título e a data.");
+                return;
+            }
+
+            const subtasks = subtasksRaw ? subtasksRaw.split(',').map((s, idx) => ({
+                id: Date.now() + idx,
+                text: s.trim(),
+                done: false
+            })).filter(s => s.text.length > 0) : [];
+
+            appState.agenda.push({
+                id: Date.now(),
+                title: title,
+                date: date,
+                category: category,
+                subtasks: subtasks,
+                done: false
+            });
+
+            saveToStorage();
+            renderAgenda();
+            closeModal('agenda-modal');
+            showToast("Compromisso agendado com sucesso! +15 XP 🚀");
+            addXP(15);
+        }
+
+        function renderAgenda() {
+            const sectionsContainer = document.getElementById('agenda-sections-container');
+            const completedContainer = document.getElementById('agenda-completed-container');
+            if(!sectionsContainer || !completedContainer) return;
+
+            sectionsContainer.innerHTML = "";
+            completedContainer.innerHTML = "";
+
+            const events = appState.agenda || [];
+            
+            const hojeEventos = [];
+            const semanaEventos = [];
+            const futurosEventos = [];
+            const concluidosEventos = [];
+
+            events.forEach(item => {
+                if (item.done) {
+                    concluidosEventos.push(item);
+                } else {
+                    const daysRemaining = calculateDaysRemaining(item.date);
+                    if (daysRemaining <= 0) {
+                        hojeEventos.push(item);
+                    } else if (daysRemaining <= 7) {
+                        semanaEventos.push(item);
+                    } else {
+                        futurosEventos.push(item);
+                    }
+                }
+            });
+
+            const sortByDate = (a, b) => new Date(a.date) - new Date(b.date);
+            hojeEventos.sort(sortByDate);
+            semanaEventos.sort(sortByDate);
+            futurosEventos.sort(sortByDate);
+            concluidosEventos.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const makeEventHtml = (item) => {
+                const daysRemaining = calculateDaysRemaining(item.date);
+                const isOverdue = daysRemaining < 0;
+                
+                let countdownLabel = "";
+                let overdueClass = "";
+                if (daysRemaining === 0) {
+                    countdownLabel = "Hoje ⚡";
+                } else if (isOverdue) {
+                    countdownLabel = `Atrasado ${Math.abs(daysRemaining)}d ⚠️`;
+                    overdueClass = "border-brandRed/45 bg-red-950/5";
+                } else {
+                    countdownLabel = `Faltam ${daysRemaining}d`;
+                }
+
+                let badgeColor = "bg-brandBlue/15 text-brandBlue border-brandBlue/30";
+                if (item.category === "Saúde") badgeColor = "bg-red-500/10 text-brandRed border-brandRed/20";
+                if (item.category === "Estudo") badgeColor = "bg-brandOrange/10 text-brandOrange border-brandOrange/20";
+                if (item.category === "Trabalho") badgeColor = "bg-brandCyan/10 text-brandCyan border-brandCyan/20";
+                if (item.category === "Pessoal") badgeColor = "bg-brandPurple/10 text-brandPurple border-brandPurple/20";
+
+                const totalSubs = item.subtasks ? item.subtasks.length : 0;
+                const completedSubs = item.subtasks ? item.subtasks.filter(s => s.done).length : 0;
+                const pct = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
+
+                let subtasksListHtml = "";
+                if (totalSubs > 0) {
+                    subtasksListHtml = `
+                        <div class="mt-2.5 border-t border-brandBorder/60 pt-2 flex flex-col gap-1.5">
+                            <div class="flex justify-between items-center text-[8px] font-black uppercase text-slate-400">
+                                <span>Ações (${completedSubs}/${totalSubs})</span>
+                                <span class="font-mono">${pct}%</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                ${item.subtasks.map(sub => `
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" ${sub.done ? 'checked' : ''} onchange="toggleAgendaSubtask(${item.id}, ${sub.id})" class="w-3.5 h-3.5 border-brandBlue">
+                                        <span class="text-[10px] leading-tight ${sub.done ? 'line-through text-slate-500' : 'text-slate-300'}">${sub.text}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="bg-brandCard border border-brandBorder rounded-2xl p-3.5 flex flex-col ${overdueClass} transition-all">
+                        <div class="flex items-start gap-2.5 justify-between">
+                            <div class="flex items-start gap-2.5 flex-1 min-w-0">
+                                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleAgendaDone(${item.id})" class="mt-0.5">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-1.5 py-0.5 bg-brandDark text-[8px] font-extrabold uppercase rounded border ${badgeColor}">${item.category}</span>
+                                        <span class="text-[9px] font-mono font-bold text-slate-400">${formatDateString(item.date)}</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold leading-tight mt-1 text-white truncate">${item.title}</h4>
+                                </div>
+                            </div>
+                            <div class="text-right flex flex-col items-end gap-1.5 ml-2">
+                                <span class="text-[9px] font-extrabold font-mono text-brandGreen bg-brandGreen/10 border border-brandGreen/25 px-2 py-0.5 rounded-full">${countdownLabel}</span>
+                                <div class="flex gap-1">
+                                    <button onclick="openSubtaskModal('agenda', ${item.id})" class="text-[8px] bg-brandBlue/15 border border-brandBlue/35 text-brandBlue px-1.5 py-0.5 rounded font-extrabold active:scale-95">Sub</button>
+                                    <button onclick="deleteAgendaItem(${item.id})" class="text-[8px] bg-brandRed/15 border border-brandRed/35 text-brandRed px-1.5 py-0.5 rounded font-extrabold active:scale-95">Del</button>
+                                </div>
+                            </div>
+                        </div>
+                        ${subtasksListHtml}
+                    </div>
+                `;
+            };
+
+            let hojeSectionHtml = "";
+            if (hojeEventos.length > 0) {
+                hojeSectionHtml = `
+                    <div class="mb-4">
+                        <h4 class="text-[9px] font-black uppercase text-brandRed tracking-widest mb-2 flex items-center gap-1.5">
+                            <span>🚨</span><span>Hoje e Atrasados</span>
+                            <span class="bg-brandRed/15 text-brandRed px-1.5 py-0.2 rounded-full font-mono text-[8px] border border-brandRed/25">${hojeEventos.length}</span>
+                        </h4>
+                        <div class="flex flex-col gap-2.5">
+                            ${hojeEventos.map(makeEventHtml).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let semanaSectionHtml = "";
+            if (semanaEventos.length > 0) {
+                semanaSectionHtml = `
+                    <div class="mb-4">
+                        <h4 class="text-[9px] font-black uppercase text-brandBlue tracking-widest mb-2 flex items-center gap-1.5">
+                            <span>📅</span><span>Esta Semana</span>
+                            <span class="bg-brandBlue/15 text-brandBlue px-1.5 py-0.2 rounded-full font-mono text-[8px] border border-brandBlue/25">${semanaEventos.length}</span>
+                        </h4>
+                        <div class="flex flex-col gap-2.5">
+                            ${semanaEventos.map(makeEventHtml).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let futuroSectionHtml = "";
+            if (futurosEventos.length > 0) {
+                futuroSectionHtml = `
+                    <div class="mb-4">
+                        <h4 class="text-[10px] font-black uppercase text-brandPurple tracking-widest mb-2 flex items-center gap-1.5">
+                            <span>🌐</span><span>Mais Futuros / Este Mês</span>
+                            <span class="bg-brandPurple/15 text-brandPurple px-1.5 py-0.2 rounded-full font-mono text-[8px] border border-brandPurple/25">${futurosEventos.length}</span>
+                        </h4>
+                        <div class="flex flex-col gap-2.5">
+                            ${futurosEventos.map(makeEventHtml).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (hojeEventos.length === 0 && semanaEventos.length === 0 && futurosEventos.length === 0) {
+                sectionsContainer.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-5">Sua agenda está limpa! Nenhum compromisso à vista.</p>`;
+            } else {
+                sectionsContainer.innerHTML = hojeSectionHtml + semanaSectionHtml + futuroSectionHtml;
+            }
+
+            if (concluidosEventos.length === 0) {
+                completedContainer.innerHTML = `<p class="text-[10px] text-slate-600 py-2 text-center font-bold">Nenhum evento finalizado recentemente.</p>`;
+            } else {
+                concluidosEventos.slice(0, 5).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-brandDark border border-brandBorder p-2.5 rounded-xl opacity-60";
+                    div.innerHTML = `
+                        <p class="text-[10px] text-slate-400 line-through flex-1 pr-2 truncate font-bold">${item.title}</p>
+                        <button onclick="toggleAgendaDone(${item.id})" class="text-[9px] text-slate-500 hover:text-white font-extrabold">Reativar</button>
+                    `;
+                    completedContainer.appendChild(div);
+                });
+            }
+        }
+
+        function toggleAgendaDone(id) {
+            const ev = appState.agenda.find(x => x.id === id);
+            if (ev) {
+                ev.done = !ev.done;
+                if (ev.done) {
+                    addXP(30); 
+                    if (ev.subtasks) ev.subtasks.forEach(s => s.done = true);
+                } else {
+                    addXP(-30);
+                }
+                saveToStorage();
+                renderAgenda();
+            }
+        }
+
+        function toggleAgendaSubtask(agendaId, subId) {
+            const ev = appState.agenda.find(x => x.id === agendaId);
+            if (ev && ev.subtasks) {
+                const sub = ev.subtasks.find(s => s.id === subId);
+                if (sub) {
+                    sub.done = !sub.done;
+                    if (sub.done) addXP(5); 
+                    else addXP(-5);
+                    saveToStorage();
+                    renderAgenda();
+                }
+            }
+        }
+
+        function deleteAgendaItem(id) {
+            triggerConfirm("Apagar este compromisso definitivamente?", () => {
+                appState.agenda = appState.agenda.filter(x => x.id !== id);
+                saveToStorage();
+                renderAgenda();
+                showToast("Compromisso removido.");
+            });
+        }
+
+        // ================= METAS (COM CHECKLIST DE SUBTAREFAS) =================
+        function renderMetas() {
+            const activeC = document.getElementById('active-metas-container');
+            const doneC = document.getElementById('completed-metas-container');
+            if(!activeC || !doneC) return;
+            
+            activeC.innerHTML = ""; doneC.innerHTML = "";
+            const target = appState.selectedMetaTab;
+            const active = appState.metas.filter(m => m.type === target && !m.done);
+            const done = appState.metas.filter(m => m.done);
+
+            document.getElementById('active-meta-count').innerText = active.length;
+            if (active.length === 0) {
+                activeC.innerHTML = `<p class="text-[10px] text-slate-500 py-3 text-center font-bold">Todos os objetivos táticos batidos! 🚀</p>`;
+            } else {
+                active.forEach(m => {
+                    const totalSubs = m.subtasks ? m.subtasks.length : 0;
+                    const completedSubs = m.subtasks ? m.subtasks.filter(s => s.done).length : 0;
+                    const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
+
+                    let subtasksHtml = "";
+                    if (totalSubs > 0) {
+                        subtasksHtml = `
+                            <div class="mt-2.5 border-t border-brandBorder/60 pt-2.5">
+                                <div class="flex justify-between text-[8px] text-slate-400 font-extrabold mb-1.5 uppercase">
+                                    <span>Sub-atividades (${completedSubs}/${totalSubs})</span>
+                                    <span>${percent}%</span>
+                                </div>
+                                <div class="flex flex-col gap-1.5 mt-1">
+                                    ${m.subtasks.map(sub => `
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" ${sub.done ? 'checked' : ''} onchange="toggleMetaSubtask(${m.id}, ${sub.id})" class="w-3.5 h-3.5 border-brandBlue">
+                                            <span class="text-[10px] leading-tight ${sub.done ? 'line-through text-slate-500' : 'text-slate-300'}">${sub.text}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    const d = document.createElement('div');
+                    d.className = "flex flex-col bg-brandDark border border-brandBorder rounded-2xl p-3.5 transition-all";
+                    d.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <p class="text-[11px] text-slate-200 flex-1 pr-3 leading-tight font-medium">${m.text}</p>
+                            <div class="flex gap-1.5">
+                                <button onclick="toggleMeta(${m.id})" class="px-2 py-1 bg-brandBlue/15 border border-brandBlue/35 text-brandBlue rounded-lg text-[9px] font-bold transition-all active:scale-95">Feito</button>
+                                <button onclick="openSubtaskModal('meta', ${m.id})" class="px-2 py-1 bg-brandPurple/20 text-brandPurple rounded-lg text-[9px] font-bold transition-all active:scale-95">Sub</button>
+                                <button onclick="triggerMetaDeleteConfirm(${m.id})" class="px-2 py-1 bg-brandRed/10 border border-brandRed/35 text-brandRed rounded-lg text-[9px] font-bold transition-all active:scale-95">Del</button>
+                            </div>
+                        </div>
+                        ${subtasksHtml}
+                    `;
+                    activeC.appendChild(d);
+                });
+            }
+
+            if (done.length === 0) {
+                doneC.innerHTML = `<p class="text-[10px] text-slate-600 py-2 text-center font-bold">Nenhum progresso registrado.</p>`;
+            } else {
+                done.forEach(m => {
+                    const d = document.createElement('div');
+                    d.className = "flex justify-between items-center bg-brandDark border border-emerald-950/20 rounded-xl p-3 opacity-60";
+                    d.innerHTML = `
+                        <p class="text-[10px] text-slate-400 line-through flex-1 pr-2 leading-tight font-bold">${m.text}</p>
+                        <button onclick="toggleMeta(${m.id})" class="px-2 py-1 text-slate-500 hover:text-white text-[9px] font-bold">Voltar</button>
+                    `;
+                    doneC.appendChild(d);
+                });
+            }
+        }
+
+        function toggleMeta(id) { 
+            const m = appState.metas.find(x => x.id === id); 
+            if (m) { 
+                m.done = !m.done; 
+                if (m.done) {
+                    addXP(50); 
+                    if (m.subtasks) m.subtasks.forEach(s => s.done = true);
+                } else {
+                    addXP(-50);
+                }
+                saveToStorage(); renderMetas(); 
+                showToast(m.done ? "Meta alcançada e documentada! +50 XP 🏆" : "Meta movida de volta às pendentes.");
+            } 
+        }
+
+        function toggleMetaSubtask(metaId, subId) {
+            const meta = appState.metas.find(x => x.id === metaId);
+            if (meta && meta.subtasks) {
+                const sub = meta.subtasks.find(s => s.id === subId);
+                if (sub) {
+                    sub.done = !sub.done;
+                    if (sub.done) addXP(10); 
+                    else addXP(-10);
+                    saveToStorage();
+                    renderMetas();
+                }
+            }
+        }
+
+        function triggerMetaDeleteConfirm(id) {
+            triggerConfirm("Remover este objetivo de forma definitiva?", () => {
+                appState.metas = appState.metas.filter(x => x.id !== id);
+                saveToStorage(); renderMetas(); showToast("Meta removida.");
+            });
+        }
+
+        function openNewMetaModal() {
+            document.getElementById('new-meta-text-input').value = "";
+            document.getElementById('new-meta-subtasks-input').value = "";
+            document.getElementById('new-meta-modal').classList.add('active');
+        }
+
+        function saveNewMetaFromModal() {
+            const text = document.getElementById('new-meta-text-input').value.trim();
+            const subtasksRaw = document.getElementById('new-meta-subtasks-input').value.trim();
+
+            if(!text) {
+                showToast("Por favor, digite a descrição da sua meta.");
+                return;
+            }
+
+            const subtasks = subtasksRaw ? subtasksRaw.split(',').map((s, idx) => ({
+                id: Date.now() + idx,
+                text: s.trim(),
+                done: false
+            })).filter(s => s.text.length > 0) : [];
+
+            appState.metas.push({ 
+                id: Date.now(), 
+                type: appState.selectedMetaTab, 
+                text: text, 
+                subtasks: subtasks,
+                done: false 
+            });
+
+            saveToStorage(); renderMetas(); closeModal('new-meta-modal'); showToast("Meta registrada no radar!");
+        }
+
+        function filterMetas(type) {
+            appState.selectedMetaTab = type;
+            ['curto', 'medio', 'longo'].forEach(t => {
+                document.getElementById(`sub-btn-${t}`).className = `sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold ${t === type ? 'text-white bg-brandBlue' : 'text-slate-400'}`;
+            });
+            const hTitles = { curto: "A Fazer (30-60 Dias)", medio: "Tático (6m - 2a)", longo: "Estrutural (2-5a)" };
+            document.getElementById('meta-horizonte-title').innerText = hTitles[type];
+            renderMetas();
+        }
+
+        // ================= OPERAÇÕES DIETA & ÁGUA =================
+        function renderDiet() {
+            const { consumed, targetCal, targetProt, presets, waterConsumed, waterTarget } = appState.diet;
+            let sumCal = 0; let sumProt = 0;
+            const listC = document.getElementById('diet-consumed-container');
+            if (!listC) return;
+            listC.innerHTML = "";
+
+            if(consumed.length === 0) listC.innerHTML = `<p class="text-[10px] text-slate-500 py-3 text-center font-bold">Nenhuma refeição registrada hoje.</p>`;
+            consumed.forEach(item => {
+                sumCal += item.cal; sumProt += item.prot;
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-brandDark p-2.5 rounded-xl border border-brandBorder";
+                div.innerHTML = `
+                    <div>
+                        <p class="text-[11px] text-white font-extrabold">${item.name}</p>
+                        <p class="text-[9px] text-slate-400">${item.cal} kcal | ${item.prot}g prot</p>
+                    </div>
+                    <button onclick="removeDietItem(${item.uid})" class="text-[10px] bg-brandRed/15 text-brandRed hover:bg-brandRed hover:text-white px-2.5 py-1 rounded-lg font-bold transition-all">Remover</button>
+                `;
+                listC.appendChild(div);
+            });
+
+            const calCurrentEl = document.getElementById('cal-current');
+            const calTargetEl = document.getElementById('cal-target');
+            const protCurrentEl = document.getElementById('prot-current');
+            const protTargetEl = document.getElementById('prot-target');
+            const calBarEl = document.getElementById('cal-bar');
+            const protBarEl = document.getElementById('prot-bar');
+
+            if (calCurrentEl) calCurrentEl.innerText = sumCal;
+            if (calTargetEl) calTargetEl.innerText = targetCal;
+            if (protCurrentEl) protCurrentEl.innerText = sumProt;
+            if (protTargetEl) protTargetEl.innerText = targetProt;
+            if (calBarEl) calBarEl.style.width = `${Math.min((sumCal/targetCal)*100, 100)}%`;
+            if (protBarEl) protBarEl.style.width = `${Math.min((sumProt/targetProt)*100, 100)}%`;
+
+            const waterCurrentEl = document.getElementById('water-current');
+            const waterTargetEl = document.getElementById('water-target');
+            const waterPercentTxtEl = document.getElementById('water-percent-txt');
+            const waterBarEl = document.getElementById('water-bar');
+
+            if (waterCurrentEl) waterCurrentEl.innerText = `${waterConsumed}ml`;
+            if (waterTargetEl) waterTargetEl.innerText = `${waterTarget}ml`;
+            const waterPercent = waterTarget > 0 ? Math.round((waterConsumed / waterTarget) * 100) : 0;
+            if (waterPercentTxtEl) waterPercentTxtEl.innerText = `${waterPercent}%`;
+            if (waterBarEl) waterBarEl.style.width = `${Math.min(waterPercent, 100)}%`;
+
+            const presetC = document.getElementById('diet-presets-container');
+            if (presetC) {
+                presetC.innerHTML = "";
+                presets.forEach(p => {
+                    const b = document.createElement('button');
+                    b.className = "bg-brandDark border border-brandBorder p-2.5 rounded-xl text-left hover:bg-slate-800 transition-all active:scale-[0.97]";
+                    b.innerHTML = `
+                        <div class="text-[10px] font-extrabold text-white line-clamp-1 mb-1">${p.name}</div>
+                        <div class="flex justify-between text-[9px] font-mono font-bold">
+                            <span class="text-brandOrange">${p.cal} kcal</span><span class="text-brandBlue">${p.prot}g p</span>
+                        </div>
+                    `;
+                    b.onclick = () => addDietItem(p);
+                    presetC.appendChild(b);
+                });
+            }
+        }
+
+        function triggerDietResetConfirm() {
+            triggerConfirm("Zerar o consumo nutricional de hoje?", () => {
+                appState.diet.consumed = [];
+                saveToStorage(); renderDiet(); showToast("Nutrição diária de hoje zerada.");
+            });
+        }
+
+        function addDietItem(item) {
+            appState.diet.consumed.push({ uid: Date.now(), name: item.name, cal: parseInt(item.cal), prot: parseInt(item.prot) });
+            saveToStorage(); renderDiet(); showToast("Alimento adicionado!");
+        }
+        
+        function removeDietItem(uid) { 
+            appState.diet.consumed = appState.diet.consumed.filter(x => x.uid !== uid); 
+            saveToStorage(); renderDiet(); 
+        }
+
+        function addWater(amount) {
+            appState.diet.waterConsumed += amount;
+            saveToStorage(); renderDiet(); showToast(`+${amount}ml de água! 💧`);
+        }
+
+        function triggerWaterResetConfirm() {
+            triggerConfirm("Zerar o controle de água de hoje?", () => {
+                appState.diet.waterConsumed = 0;
+                saveToStorage(); renderDiet(); showToast("Hidratação diária zerada.");
+            });
+        }
+
+        function openCustomMealModal() {
+            document.getElementById('custom-meal-name').value = "";
+            document.getElementById('custom-meal-cal').value = "";
+            document.getElementById('custom-meal-prot').value = "";
+            document.getElementById('custom-meal-modal').classList.add('active');
+        }
+        
+        function saveCustomMeal() {
+            const name = document.getElementById('custom-meal-name').value;
+            const cal = document.getElementById('custom-meal-cal').value;
+            const prot = document.getElementById('custom-meal-prot').value;
+            if(!name || !cal || !prot) {
+                showToast("Erro: Preencha todos os campos.");
+                return;
+            }
+            addDietItem({ name, cal, prot });
+            closeModal('custom-meal-modal');
+        }
+
+        function openPresetManagerModal() { 
+            renderPresetManagerList(); 
+            document.getElementById('preset-manager-modal').classList.add('active'); 
+        }
+
+        function renderPresetManagerList() {
+            const container = document.getElementById('preset-list-container');
+            container.innerHTML = "";
+            appState.diet.presets.forEach(p => {
+                const el = document.createElement('div');
+                el.className = "flex justify-between items-center bg-brandCard p-2.5 rounded-xl border border-brandBorder";
+                el.innerHTML = `
+                    <div class="flex-1 pr-2">
+                        <p class="text-[10px] text-white font-bold truncate">${p.name}</p>
+                        <p class="text-[8px] text-slate-400">${p.cal} kcal | ${p.prot}g prot</p>
+                    </div>
+                    <button onclick="triggerDeletePresetConfirm(${p.id})" class="text-[9px] text-brandRed bg-brandRed/10 border border-brandRed/20 px-2 py-1 rounded-lg font-bold">Excluir</button>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function triggerDeletePresetConfirm(id) {
+            triggerConfirm("Excluir este botão de adição rápida de refeição?", () => {
+                appState.diet.presets = appState.diet.presets.filter(x => x.id !== id);
+                saveToStorage(); renderPresetManagerList(); renderDiet(); showToast("Botão rápido removido.");
+            });
+        }
+
+        function saveNewPreset() {
+            const name = document.getElementById('new-preset-name').value;
+            const cal = document.getElementById('new-preset-cal').value;
+            const prot = document.getElementById('new-preset-prot').value;
+            if(!name || !cal || !prot) {
+                showToast("Erro: Preencha todos os campos.");
+                return;
+            }
+            appState.diet.presets.push({ id: Date.now(), name, cal: parseInt(cal), prot: parseInt(prot) });
+            document.getElementById('new-preset-name').value = '';
+            document.getElementById('new-preset-cal').value = ''; 
+            document.getElementById('new-preset-prot').value = '';
+            saveToStorage(); renderPresetManagerList(); renderDiet(); showToast("Prato rápido salvo!");
+        }
+
+        function openGoalSettingsModal() {
+            document.getElementById('goal-modal-cal').value = appState.diet.targetCal;
+            document.getElementById('goal-modal-prot').value = appState.diet.targetProt;
+            document.getElementById('goal-modal-water').value = appState.diet.waterTarget;
+            document.getElementById('goal-settings-modal').classList.add('active');
+        }
+
+        function saveGoalSettings() {
+            const cal = parseInt(document.getElementById('goal-modal-cal').value);
+            const prot = parseInt(document.getElementById('goal-modal-prot').value);
+            const water = parseInt(document.getElementById('goal-modal-water').value);
+            if (isNaN(cal) || isNaN(prot) || isNaN(water) || cal <= 0 || prot <= 0 || water <= 0) {
+                showToast("Insira valores válidos.");
+                return;
+            }
+            appState.diet.targetCal = cal;
+            appState.diet.targetProt = prot;
+            appState.diet.waterTarget = water;
+            saveToStorage(); renderDiet(); closeModal('goal-settings-modal'); showToast("Metas diárias atualizadas!");
+        }
+
+        // ================= OPERAÇÕES TAREFAS DE ROTINA =================
+        function openTaskModal(id) {
+            const modalTitle = document.getElementById('task-modal-title');
+            document.getElementById('task-modal-id').value = '';
+            document.getElementById('task-modal-time').value = '';
+            document.getElementById('task-modal-start').value = '';
+            document.getElementById('task-modal-end').value = '';
+            document.getElementById('task-modal-text').value = '';
+
+            if (id) {
+                const task = appState.routines[appState.currentMode].find(t => t.id === id);
+                if (task) {
+                    modalTitle.innerText = "Editar Tarefa";
+                    document.getElementById('task-modal-id').value = task.id;
+                    document.getElementById('task-modal-time').value = task.time;
+                    document.getElementById('task-modal-start').value = task.start;
+                    document.getElementById('task-modal-end').value = task.end;
+                    document.getElementById('task-modal-text').value = task.text;
+                }
+            } else {
+                modalTitle.innerText = "Nova Tarefa";
+            }
+
+            document.getElementById('task-modal').classList.add('active');
+        }
+
+        function saveTaskModal() {
+            const idVal = document.getElementById('task-modal-id').value;
+            const time = document.getElementById('task-modal-time').value.trim();
+            const start = parseInt(document.getElementById('task-modal-start').value);
+            const end = parseInt(document.getElementById('task-modal-end').value);
+            const text = document.getElementById('task-modal-text').value.trim();
+
+            if (!time || isNaN(start) || isNaN(end) || !text) {
+                showToast("Erro: Preencha todos os campos corretamente.");
+                return;
+            }
+
+            const currentTasks = appState.routines[appState.currentMode];
+
+            if (idVal) {
+                const task = currentTasks.find(t => t.id === parseInt(idVal));
+                if (task) {
+                    task.time = time;
+                    task.start = start;
+                    task.end = end;
+                    task.text = text;
+                    showToast("Tarefa atualizada!");
+                }
+            } else {
+                const newId = Date.now();
+                currentTasks.push({ id: newId, time, start, end, text, done: false });
+                showToast("Tarefa adicionada à rotina!");
+            }
+
+            saveToStorage();
+            renderRoutine();
+            closeModal('task-modal');
+        }
+
+        function triggerTaskDeleteConfirm(id) {
+            triggerConfirm("Apagar esta tarefa permanentemente da sua rotina?", () => {
+                appState.routines[appState.currentMode] = appState.routines[appState.currentMode].filter(x => x.id !== id);
+                saveToStorage(); renderRoutine(); showToast("Tarefa excluída.");
+            });
+        }
+
+        // ================= CONECTOR INTELIGENTE GEMINI API =================
+        async function fetchWithBackoff(url, options, retries = 5, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    if (retries > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                    }
+                    throw new Error(`Status ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        }
+
+        async function askNutriAI() {
+            const promptInput = document.getElementById('ai-diet-prompt');
+            const userQuery = promptInput.value.trim();
+            if (!userQuery) {
+                showToast("Descreva o que comeu.");
+                return;
+            }
+
+            const btnText = document.getElementById('ai-btn-text');
+            const spinner = document.getElementById('ai-loading-spinner');
+            const resultCard = document.getElementById('ai-result-card');
+            
+            btnText.innerText = "Analisando...";
+            spinner.classList.remove('hidden');
+            resultCard.classList.add('hidden');
+
+            const apiKey = appState.geminiApiKey; 
+            if (!apiKey) {
+                showToast("⚠️ Vá na aba 'Ajustes' e cole sua Chave Gemini lá.");
+                btnText.innerText = "Analisar Alimento ⚡";
+                spinner.classList.add('hidden');
+                return;
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `Você é um nutricionista focado em performance. Estime calorias e proteínas da comida em formato JSON estruturado.
+            Responda EXCLUSIVAMENTE em JSON conforme o responseSchema. No campo 'name', use um termo conciso. No campo 'explanation', dê detalhes breves de até 120 caracteres.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            name: { type: "STRING" },
+                            cal: { type: "INTEGER" },
+                            prot: { type: "INTEGER" },
+                            explanation: { type: "STRING" }
+                        },
+                        required: ["name", "cal", "prot", "explanation"]
+                    }
+                }
+            };
+
+            try {
+                const response = await fetchWithBackoff(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message || "Chave inválida ou revogada.");
+                }
+
+                const aiRawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!aiRawText) throw new Error("Sem resposta da IA.");
+
+                const result = JSON.parse(aiRawText);
+                lastAIResult = result;
+
+                document.getElementById('ai-result-name').innerText = result.name;
+                document.getElementById('ai-result-cal').innerText = `${result.cal} kcal`;
+                document.getElementById('ai-result-prot').innerText = `${result.prot}g`;
+                document.getElementById('ai-result-explanation').innerText = result.explanation;
+                resultCard.classList.remove('hidden');
+                showToast("Alimento analisado! 🎉");
+            } catch (err) {
+                console.error(err);
+                showToast("Erro IA: " + err.message);
+            } finally {
+                btnText.innerText = "Analisar Alimento ⚡";
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function addAIResultToDiet() {
+            if (!lastAIResult) {
+                showToast("Nenhuma análise disponível para adicionar.");
+                return;
+            }
+            addDietItem({ name: lastAIResult.name, cal: lastAIResult.cal, prot: lastAIResult.prot });
+            document.getElementById('ai-result-card').classList.add('hidden');
+            document.getElementById('ai-diet-prompt').value = '';
+            lastAIResult = null;
+        }
+
+        function saveAIResultAsPreset() {
+            if (!lastAIResult) {
+                showToast("Nenhuma análise disponível para salvar.");
+                return;
+            }
+            appState.diet.presets.push({
+                id: Date.now(),
+                name: lastAIResult.name,
+                cal: lastAIResult.cal,
+                prot: lastAIResult.prot
+            });
+            saveToStorage();
+            renderDiet();
+            showToast("Atalho salvo com sucesso! ⚡");
+        }
+
+        async function askMentorAI() {
+            const excuseInput = document.getElementById('ai-mentor-excuse');
+            const excuse = excuseInput.value.trim() || "Estou com preguiça e pensando em quebrar a rotina hoje.";
+            
+            const btn = document.getElementById('btn-ask-mentor');
+            const spinner = document.getElementById('mentor-spinner');
+            const resultDiv = document.getElementById('ai-mentor-result');
+            const resultText = document.getElementById('ai-mentor-text');
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+
+            const apiKey = appState.geminiApiKey; 
+            if (!apiKey) {
+                showToast("⚠️ Vá na aba 'Ajustes' e cole sua Chave Gemini lá.");
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                return;
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            const tasks = appState.routines[appState.currentMode] || [];
+            const completed = tasks.filter(t => t.done).length;
+            const total = tasks.length;
+            const completionPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            const systemPrompt = `Você é David Goggins mesclado com um sargento instrutor implacável.
+            O usuário está procrastinando e quer desculpas. Destrua a preguiça dele.
+            Saiba que hoje ele concluiu apenas ${completionPercent}% da rotina diária (${completed} de ${total} tarefas).
+            Seja curto (máximo de 4 linhas / 250 caracteres), agressivo e motivador de forma visceral. Sem enrolações. Vá direto à cobrança.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: `Desculpa do usuário: "${excuse}"` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetchWithBackoff(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error.message || "Chave inválida ou revogada.");
+                }
+
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("Sem resposta da IA.");
+
+                resultText.innerText = text;
+                resultDiv.classList.remove('hidden');
+                excuseInput.value = "";
+                showToast("Foco blindado! 💀");
+            } catch (err) {
+                console.error(err);
+                showToast("Erro IA: " + err.message);
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // ================= SISTEMA DE BACKUP & COPIA SENSÍVEL A IFRAMES =================
+        function triggerResetDefaultConfirm() {
+            triggerConfirm("Restaurar todas as configurações originais? Isso vai apagar rotina personalizada, metas, agenda e histórico de dieta salvos neste dispositivo.", () => {
+                safeStorage.removeItem('planner_v7_rpg');
+                location.reload();
+            });
+        }
+
+        function exportBackupData() {
+            const blob = new Blob([JSON.stringify(appState, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.href = url; a.download = `backup_central_comando_${Date.now()}.json`;
+            a.click(); URL.revokeObjectURL(url); showToast("Backup baixado com sucesso!");
+        }
+
+        function importBackupData(evt) {
+            const file = evt.target.files[0]; if (!file) return;
+            const r = new FileReader();
+            r.onload = e => {
+                try { 
+                    appState = {...appState, ...JSON.parse(e.target.result)}; 
+                    saveToStorage(); renderAll(); calculateScale(); 
+                    showToast("Base de dados sincronizada com sucesso!"); 
+                } 
+                catch (err) { showToast("Erro: Arquivo JSON corrompido."); }
+            }; r.readAsText(file);
+        }
+
+        function copyToWord() {
+            const makeList = arr => arr.map(m => `<tr><td style="padding:10px;font-size:11pt;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;">${m.done ? `<s>${m.text}</s>` : m.text}</td><td style="padding:10px;color:${m.done?'#10b981':'#f59e0b'};border-bottom:1px solid #e2e8f0;font-weight:bold;font-family:Arial,sans-serif;text-align:right;">${m.done?'CONCLUÍDO':'PENDENTE'}</td></tr>`).join('');
+            const makeAgendaList = arr => arr.map(a => `<tr><td style="padding:10px;font-size:11pt;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;"><b>[${a.category}]</b> ${a.title} (Data: ${new Date(a.date+'T00:00:00').toLocaleDateString('pt-BR')})</td><td style="padding:10px;color:${a.done?'#10b981':'#f59e0b'};border-bottom:1px solid #e2e8f0;font-weight:bold;font-family:Arial,sans-serif;text-align:right;">${a.done?'CONCLUÍDO':'PENDENTE'}</td></tr>`).join('');
+            
+            const html = `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;color:#111827;padding:20px;border:1px solid #e2e8f0;border-radius:12px;">
+                <h1 style="color:#1e3a8a;border-bottom:3px solid #3b82f6;padding-bottom:10px;text-transform:uppercase;font-size:18pt;margin-bottom:20px;">Central de Comando - Relatório Geral</h1>
+                
+                <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Compromissos Agendados</h2>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:25px;">${appState.agenda.length > 0 ? makeAgendaList(appState.agenda) : '<tr><td style="padding:10px;font-size:11pt;color:#6b7280;">Nenhum compromisso agendado.</td></tr>'}</table>
+
+                <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Curto Prazo (30-60 dias)</h2>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:25px;">${makeList(appState.metas.filter(m=>m.type==='curto'))}</table>
+                
+                <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Médio Prazo (6 Meses a 2 anos)</h2>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:25px;">${makeList(appState.metas.filter(m=>m.type==='medio'))}</table>
+                
+                <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Longo Prazo (2 a 5 anos)</h2>
+                <table style="width:100%;border-collapse:collapse;">${makeList(appState.metas.filter(m=>m.type==='longo'))}</table>
+            </div>`;
+
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = html;
+            dummy.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast("Copiado com sucesso! Agora é só colar no Word.");
+                } else {
+                    throw new Error();
+                }
+            } catch (err) {
+                const blob = new Blob([html], { type: 'text/html' });
+                navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
+                    .then(() => showToast("Copiado! Basta colar direto no Word."))
+                    .catch(() => showToast("Erro ao copiar. Tente selecionar o texto manualmente."));
+            }
+            document.body.removeChild(dummy);
+        }
+    </script>
+</body>
+</html>
