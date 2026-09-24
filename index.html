@@ -69,7 +69,7 @@
         }
         input[type="checkbox"]:checked { background-color: #10b981; border-color: #10b981; }
         input[type="checkbox"]:checked::after {
-            content: '✓'; position: absolute; color: #070a13; font-size: 13px; font-weight: 900;
+            content: 'âœ“'; position: absolute; color: #070a13; font-size: 13px; font-weight: 900;
             top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
         .task-done-text { text-decoration: line-through; color: #4b5563; }
@@ -93,6 +93,7 @@
         .cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border-radius: 8px; border: 1px solid transparent; transition: all 0.15s ease; }
         .cal-work { background-color: rgba(59, 130, 246, 0.12); color: #60a5fa; border-color: rgba(59, 130, 246, 0.25); }
         .cal-free { background-color: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.25); }
+        .cal-vacation { background-color: rgba(168, 85, 247, 0.14); color: #d8b4fe; border-color: rgba(168, 85, 247, 0.35); }
         .cal-today { border-color: #ffffff !important; box-shadow: inset 0 0 0 2px #fff; }
         .cal-header { font-size: 9px; color: #6b7280; text-transform: uppercase; text-align: center; margin-bottom: 6px; font-weight: bold; }
         .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -103,49 +104,49 @@
 </head>
 <body class="min-h-screen flex flex-col max-w-md mx-auto relative px-4 pb-12">
 
-    <!-- CABEÇALHO DA CENTRAL -->
+    <!-- CABEÃ‡ALHO DA CENTRAL -->
     <header class="py-4 mt-2 border-b border-brandBorder">
         <div class="flex justify-between items-center mb-3">
             <div>
                 <h1 class="text-xl font-extrabold tracking-tight text-white uppercase flex items-center gap-1.5">
                     Comando Pessoal <span class="text-xs px-2 py-0.5 bg-brandBlue/10 text-brandBlue rounded-full font-mono">v7.0</span>
                 </h1>
-                <p class="text-[10px] text-brandBlue font-bold tracking-widest uppercase">Constância, Foco & Disciplina</p>
+                <p class="text-[10px] text-brandBlue font-bold tracking-widest uppercase">ConstÃ¢ncia, Foco & Disciplina</p>
             </div>
             <div class="bg-brandCard border border-brandBorder px-3 py-1 rounded-full text-xs font-mono text-slate-400 font-bold" id="live-clock">
                 00:00:00
             </div>
         </div>
 
-        <!-- CONSOLE DE STATUS RPG (XP, RANK, SEQUÊNCIA & GELINHO) -->
+        <!-- CONSOLE DE STATUS RPG (XP, RANK, SEQUÃŠNCIA & GELINHO) -->
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-3.5 flex flex-col gap-2.5 shadow-md cursor-pointer hover:bg-slate-800/40 transition-all active:scale-[0.99]" onclick="openRanksModal()">
             <div class="flex justify-between items-center">
                 <div class="flex flex-col">
                     <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Patamar de Combate</span>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-xs px-2 py-0.5 bg-brandPurple/20 text-brandPurple rounded-full font-black text-[10px] border border-brandPurple/35" id="rpg-level">Nível 1</span>
-                        <strong class="text-[10px] uppercase font-black tracking-wide" id="rpg-rank">Recruta Neófito 🛡️</strong>
+                        <span class="text-xs px-2 py-0.5 bg-brandPurple/20 text-brandPurple rounded-full font-black text-[10px] border border-brandPurple/35" id="rpg-level">NÃ­vel 1</span>
+                        <strong class="text-[10px] uppercase font-black tracking-wide" id="rpg-rank">Recruta NeÃ³fito ðŸ›¡ï¸</strong>
                     </div>
                 </div>
                 <div class="flex gap-4">
                     <div class="flex flex-col items-center" title="Dias Perfeitos Seguidos" onclick="event.stopPropagation()">
-                        <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Sequência</span>
-                        <span class="text-xs font-black text-brandOrange mt-0.5 flex items-center gap-0.5">🔥 <span id="rpg-streak">0d</span></span>
+                        <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">SequÃªncia</span>
+                        <span class="text-xs font-black text-brandOrange mt-0.5 flex items-center gap-0.5">ðŸ”¥ <span id="rpg-streak">0d</span></span>
                     </div>
-                    <div class="flex flex-col items-center cursor-pointer" onclick="buyFreeze(); event.stopPropagation()" title="Gelinho de Proteção (Custo: 200 XP)">
-                        <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Perdões (Gelinhos)</span>
-                        <span class="text-xs font-black text-brandCyan mt-0.5 flex items-center gap-0.5">❄️ <span id="rpg-freezes">0/3</span></span>
+                    <div class="flex flex-col items-center cursor-pointer" onclick="buyFreeze(); event.stopPropagation()" title="Gelinho de ProteÃ§Ã£o (Custo: 200 XP)">
+                        <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">PerdÃµes (Gelinhos)</span>
+                        <span class="text-xs font-black text-brandCyan mt-0.5 flex items-center gap-0.5">â„ï¸ <span id="rpg-freezes">0/3</span></span>
                     </div>
                 </div>
             </div>
-            <!-- BARRA DE EXPERIÊNCIA (XP) -->
+            <!-- BARRA DE EXPERIÃŠNCIA (XP) -->
             <div>
                 <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder relative overflow-hidden">
                     <div class="bg-gradient-to-r from-brandPurple to-brandCyan h-full transition-all duration-500 rounded-full" id="rpg-xp-bar" style="width: 0%"></div>
                 </div>
                 <div class="flex justify-between text-[8px] font-mono text-slate-500 mt-1" onclick="event.stopPropagation()">
                     <span id="rpg-xp-text">0 / 100 XP</span>
-                    <button onclick="openRanksModal()" class="hover:text-brandCyan transition-colors font-bold uppercase tracking-wider flex items-center gap-0.5 text-slate-400">Ver Tiers 🏆</button>
+                    <button onclick="openRanksModal()" class="hover:text-brandCyan transition-colors font-bold uppercase tracking-wider flex items-center gap-0.5 text-slate-400">Ver Tiers ðŸ†</button>
                 </div>
             </div>
         </div>
@@ -154,11 +155,11 @@
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-3.5 flex justify-between items-center cursor-pointer hover:bg-slate-800/50 transition-all active:scale-[0.99] shadow-md" onclick="openCalendarModal()">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-brandDark border border-brandBorder flex items-center justify-center text-xl" id="scale-icon">
-                    ⚙️
+                    âš™ï¸
                 </div>
                 <div>
                     <span class="block text-[9px] text-slate-400 font-extrabold uppercase mb-0.5 flex items-center gap-1">
-                        Escala Operacional (6x3) <span class="text-[10px]">📅</span>
+                        <span id="scale-name-label">Escala Operacional (6x3)</span> <span class="text-[10px]">ðŸ“…</span>
                     </span>
                     <strong class="text-xs text-brandGreen font-extrabold" id="scale-status-text">Calculando ciclo atual...</strong>
                 </div>
@@ -167,54 +168,63 @@
         </div>
     </header>
 
-    <!-- NAVEGAÇÃO PRINCIPAL -->
+    <!-- NAVEGAÃ‡ÃƒO PRINCIPAL -->
     <nav class="flex overflow-x-auto scrollbar-none whitespace-nowrap border-b border-brandBorder bg-brandDark sticky top-0 z-40 mb-4 text-[11px] font-bold scroll-smooth">
         <button onclick="openTab(event, 'tab-rotina')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all active-tab-btn flex flex-col items-center gap-1">
-            <span class="text-base">⏳</span><span>Rotina</span>
+            <span class="text-base">â³</span><span>Rotina</span>
         </button>
         <button onclick="openTab(event, 'tab-agenda')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
-            <span class="text-base">📅</span><span>Agenda</span>
+            <span class="text-base">ðŸ“…</span><span>Agenda</span>
         </button>
         <button onclick="openTab(event, 'tab-dieta')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
-            <span class="text-base">🥗</span><span>Dieta & Água</span>
+            <span class="text-base">ðŸ¥—</span><span>Dieta & Ãgua</span>
         </button>
         <button onclick="openTab(event, 'tab-metas')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
-            <span class="text-base">🎯</span><span>Metas</span>
+            <span class="text-base">ðŸŽ¯</span><span>Metas</span>
         </button>
         <button onclick="openTab(event, 'tab-config')" class="tab-link py-3 px-5 flex-shrink-0 text-center text-slate-400 hover:text-white transition-all flex flex-col items-center gap-1">
-            <span class="text-base">⚙️</span><span>Ajustes</span>
+            <span class="text-base">âš™ï¸</span><span>Ajustes</span>
         </button>
     </nav>
 
-    <!-- TOAST DE NOTIFICAÇÃO -->
-    <div id="toast">Operação realizada com sucesso!</div>
+    <!-- TOAST DE NOTIFICAÃ‡ÃƒO -->
+    <div id="toast">OperaÃ§Ã£o realizada com sucesso!</div>
 
-    <!-- CONTEÚDO PRINCIPAL (TABS) -->
+    <!-- CONTEÃšDO PRINCIPAL (TABS) -->
     <main class="flex-1">
         
         <!-- ================= TAB: ROTINA ================= -->
         <section id="tab-rotina" class="tab-content active">
+            <div class="bg-gradient-to-r from-blue-950/40 to-emerald-950/30 border border-brandBlue/25 rounded-2xl p-4 mb-4 shadow-lg">
+                <div class="flex items-start gap-2.5">
+                    <span class="text-lg">ðŸŒ±</span>
+                    <div>
+                        <span class="block text-[8px] text-brandBlue font-black uppercase tracking-widest mb-1">InspiraÃ§Ã£o do dia</span>
+                        <p class="text-[11px] text-slate-200 leading-relaxed font-medium" id="daily-motivation-text"></p>
+                    </div>
+                </div>
+            </div>
             <!-- SELETOR DE MODELOS -->
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <button onclick="switchMode('A')" id="btn-mode-A" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandBlue text-white flex flex-col items-center justify-center active:scale-95">
-                    <span class="mb-1 text-base">🏢💪</span> [A] CLT + Treino
+                    <span class="mb-1 text-base">ðŸ¢ðŸ’ª</span> [A] CLT + Treino
                 </button>
                 <button onclick="switchMode('B')" id="btn-mode-B" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95">
-                    <span class="mb-1 text-base">🏢🛋️</span> [B] CLT s/ Treino
+                    <span class="mb-1 text-base">ðŸ¢ðŸ›‹ï¸</span> [B] CLT s/ Treino
                 </button>
                 <button onclick="switchMode('C')" id="btn-mode-C" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95">
-                    <span class="mb-1 text-base">🌴💪</span> [C] Folga + Treino
+                    <span class="mb-1 text-base">ðŸŒ´ðŸ’ª</span> [C] Folga + Treino
                 </button>
                 <button onclick="switchMode('D')" id="btn-mode-D" class="py-2.5 px-2 rounded-xl text-[10px] font-extrabold transition-all border border-brandBorder bg-brandCard text-slate-400 flex flex-col items-center justify-center active:scale-95">
-                    <span class="mb-1 text-base">🌴🎮</span> [D] Folga Total
+                    <span class="mb-1 text-base">ðŸŒ´ðŸŽ®</span> [D] Folga Total
                 </button>
             </div>
 
             <!-- CARD DE PROGRESSO DE TAREFAS -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] text-slate-400 font-extrabold uppercase">Desempenho Diário</span>
-                    <strong class="text-xs text-brandBlue font-mono" id="routine-progress-percent">0% Concluído</strong>
+                    <span class="text-[10px] text-slate-400 font-extrabold uppercase">Desempenho DiÃ¡rio</span>
+                    <strong class="text-xs text-brandBlue font-mono" id="routine-progress-percent">0% ConcluÃ­do</strong>
                 </div>
                 <div class="w-full bg-brandDark rounded-full h-3 border border-brandBorder">
                     <div class="bg-gradient-to-r from-brandBlue to-brandGreen h-3 rounded-full transition-all duration-500" id="routine-progress-bar" style="width: 0%"></div>
@@ -222,7 +232,7 @@
                 <p class="text-[9px] text-slate-500 mt-2 italic text-center" id="routine-motivational-text">Execute a primeira tarefa para engrenar!</p>
             </div>
 
-            <!-- CONTROLE DO MÓDULO -->
+            <!-- CONTROLE DO MÃ“DULO -->
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider" id="routine-title-display">Modelo [A]</h2>
                 <button onclick="openTaskModal()" class="text-[10px] bg-brandBlue/10 border border-brandBlue/30 text-brandBlue px-2.5 py-1.5 rounded-xl font-bold hover:bg-brandBlue hover:text-white transition-all active:scale-95">+ Nova Tarefa</button>
@@ -231,17 +241,17 @@
             <!-- CONTAINER DE TAREFAS -->
             <div class="flex flex-col gap-2.5" id="routine-tasks-container"></div>
 
-            <!-- WIDGET DE COBRANÇA MENTAL (IA) -->
+            <!-- WIDGET DE COBRANÃ‡A MENTAL (IA) -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mt-6 shadow-lg">
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="text-base">💀</span>
-                    <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Cobrança e Choque da IA</h3>
+                    <span class="text-base">ðŸŒ±</span>
+                    <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Incentivo da IA</h3>
                 </div>
-                <p class="text-[10px] text-slate-400 leading-tight mb-3">Está procrastinando ou inventando desculpas? Clique no botão e receba a chamada de autodisciplina do seu Mentor Executivo.</p>
+                <p class="text-[10px] text-slate-400 leading-tight mb-3">EstÃ¡ com dificuldade para comeÃ§ar? Conte o que estÃ¡ acontecendo e receba um incentivo gentil para dar o prÃ³ximo passo.</p>
                 <div class="flex gap-2">
                     <input type="text" id="ai-mentor-excuse" class="flex-1 bg-brandDark border border-brandBorder rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brandRed" placeholder="Digite sua desculpa...">
                     <button onclick="askMentorAI()" id="btn-ask-mentor" class="px-3 bg-brandRed/15 border border-brandRed/30 hover:bg-brandRed text-brandRed hover:text-white text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1">
-                        <span>Cobrar ⚡</span>
+                        <span>Me incentivar ðŸŒ±</span>
                         <svg id="mentor-spinner" class="hidden animate-spin h-3.5 w-3.5 text-brandRed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -254,36 +264,36 @@
             </div>
         </section>
 
-        <!-- ================= TAB: AGENDA (SEÇÕES HOJE, SEMANA, MES) ================= -->
+        <!-- ================= TAB: AGENDA (SEÃ‡Ã•ES HOJE, SEMANA, MES) ================= -->
         <section id="tab-agenda" class="tab-content">
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1">
-                        <span>📅 Compromissos do Comando</span>
+                        <span>ðŸ“… Compromissos do Comando</span>
                     </h3>
                     <button onclick="openAgendaModal()" class="text-[10px] bg-brandBlue/10 border border-brandBlue/30 text-brandBlue px-2.5 py-1.5 rounded-xl font-bold active:scale-95 transition-all">+ Novo Evento</button>
                 </div>
-                <p class="text-[10px] text-slate-400 leading-tight">Organize consultas, viagens e tarefas agendadas em blocos cronológicos estruturados de tempo.</p>
+                <p class="text-[10px] text-slate-400 leading-tight">Organize consultas, viagens e tarefas agendadas em blocos cronolÃ³gicos estruturados de tempo.</p>
             </div>
 
-            <!-- CONTAINER DINÂMICO DE SEÇÕES DE AGENDA -->
+            <!-- CONTAINER DINÃ‚MICO DE SEÃ‡Ã•ES DE AGENDA -->
             <div class="flex flex-col gap-4 mb-6" id="agenda-sections-container"></div>
             
-            <!-- COMPROMISSOS CONCLUÍDOS -->
+            <!-- COMPROMISSOS CONCLUÃDOS -->
             <div class="bg-emerald-950/10 border border-emerald-900/30 rounded-2xl p-4">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-brandGreen mb-3">🏆 Eventos Concluídos</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-brandGreen mb-3">ðŸ† Eventos ConcluÃ­dos</h3>
                 <div class="flex flex-col gap-2.5" id="agenda-completed-container"></div>
             </div>
         </section>
 
-        <!-- ================= TAB: DIETA & ÁGUA ================= -->
+        <!-- ================= TAB: DIETA & ÃGUA ================= -->
         <section id="tab-dieta" class="tab-content">
             <!-- PAINEL MACRONUTRIENTES -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Combustível Diário</h3>
+                    <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">CombustÃ­vel DiÃ¡rio</h3>
                     <div class="flex gap-2">
-                        <button onclick="openGoalSettingsModal()" class="text-[10px] text-brandBlue font-extrabold hover:text-blue-300 flex items-center gap-0.5">⚙ Metas</button>
+                        <button onclick="openGoalSettingsModal()" class="text-[10px] text-brandBlue font-extrabold hover:text-blue-300 flex items-center gap-0.5">âš™ Metas</button>
                         <button onclick="triggerDietResetConfirm()" class="text-[10px] text-slate-500 font-extrabold hover:text-brandRed">Zerar Consumo</button>
                     </div>
                 </div>
@@ -299,23 +309,31 @@
                     </div>
                 </div>
                 
-                <!-- PROTEÍNAS -->
-                <div>
+                <!-- PROTEÃNAS -->
+                <div class="mb-3.5">
                     <div class="flex justify-between text-[10px] font-bold mb-1">
-                        <span class="text-brandBlue">Proteínas (g)</span>
+                        <span class="text-brandBlue">ProteÃ­nas (g)</span>
                         <span class="text-slate-300 font-mono"><span id="prot-current" class="font-extrabold">0</span> / <span id="prot-target">160</span>g</span>
                     </div>
                     <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder">
                         <div class="bg-brandBlue h-2.5 rounded-full transition-all duration-500" id="prot-bar" style="width: 0%"></div>
                     </div>
                 </div>
+                <div class="mb-3.5">
+                    <div class="flex justify-between text-[10px] font-bold mb-1"><span class="text-brandGreen">Carboidratos (g)</span><span class="text-slate-300 font-mono"><span id="carb-current" class="font-extrabold">0</span> / <span id="carb-target">250</span>g</span></div>
+                    <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder"><div class="bg-brandGreen h-2.5 rounded-full transition-all duration-500" id="carb-bar" style="width: 0%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-[10px] font-bold mb-1"><span class="text-brandPurple">Gorduras (g)</span><span class="text-slate-300 font-mono"><span id="fat-current" class="font-extrabold">0</span> / <span id="fat-target">70</span>g</span></div>
+                    <div class="w-full bg-brandDark rounded-full h-2.5 border border-brandBorder"><div class="bg-brandPurple h-2.5 rounded-full transition-all duration-500" id="fat-bar" style="width: 0%"></div></div>
+                </div>
             </div>
 
-            <!-- CONTROLE DE HIDRATAÇÃO -->
+            <!-- CONTROLE DE HIDRATAÃ‡ÃƒO -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-xs font-extrabold text-brandCyan uppercase tracking-wider flex items-center gap-1.5">
-                        <span>💧 Hidratação Executiva</span>
+                        <span>ðŸ’§ HidrataÃ§Ã£o Executiva</span>
                     </h3>
                     <div class="flex items-center gap-2">
                         <button onclick="triggerWaterResetConfirm()" class="text-[9px] text-slate-500 font-bold hover:text-brandRed">Reset</button>
@@ -353,13 +371,13 @@
             <!-- CONSULTOR NUTRICIONAL (IA) -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-4 mb-4 shadow-lg">
                 <h3 class="text-xs font-extrabold text-brandGreen uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                    <span>🤖 Consultar IA Nutricional</span>
+                    <span>ðŸ¤– Consultar IA Nutricional</span>
                 </h3>
-                <p class="text-[10px] text-slate-400 mb-2 leading-tight">Descreva o que você comeu e a IA fará os cálculos de macros para você.</p>
+                <p class="text-[10px] text-slate-400 mb-2 leading-tight">Descreva o que vocÃª comeu e a IA farÃ¡ os cÃ¡lculos de macros para vocÃª.</p>
                 <div class="flex flex-col gap-2">
-                    <textarea id="ai-diet-prompt" rows="2" class="w-full bg-brandDark border border-brandBorder rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brandBlue resize-none" placeholder="Ex: Comi 150g de filé de frango grelhado com 4 colheres de arroz..."></textarea>
+                    <textarea id="ai-diet-prompt" rows="2" class="w-full bg-brandDark border border-brandBorder rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brandBlue resize-none" placeholder="Ex: Comi 150g de filÃ© de frango grelhado com 4 colheres de arroz..."></textarea>
                     <button onclick="askNutriAI()" id="btn-ask-ai" class="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95">
-                        <span id="ai-btn-text">Analisar Alimento ⚡</span>
+                        <span id="ai-btn-text">Analisar Alimento âš¡</span>
                         <svg id="ai-loading-spinner" class="hidden animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -369,7 +387,7 @@
 
                 <div id="ai-result-card" class="hidden mt-3 p-3 bg-brandDark border border-brandBorder rounded-xl transition-all">
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="text-xs font-bold text-white uppercase" id="ai-result-name">Análise</h4>
+                        <h4 class="text-xs font-bold text-white uppercase" id="ai-result-name">AnÃ¡lise</h4>
                         <span class="text-[9px] text-slate-500 font-mono">Estimativa IA</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 mb-3">
@@ -378,9 +396,11 @@
                             <strong class="text-sm text-brandOrange font-mono" id="ai-result-cal">0 kcal</strong>
                         </div>
                         <div class="bg-brandCard p-2 rounded-lg text-center border border-brandBorder">
-                            <span class="block text-[9px] text-slate-400">Proteínas</span>
+                            <span class="block text-[9px] text-slate-400">ProteÃ­nas</span>
                             <strong class="text-sm text-brandBlue font-mono" id="ai-result-prot">0g</strong>
                         </div>
+                        <div class="bg-brandCard p-2 rounded-lg text-center border border-brandBorder"><span class="block text-[9px] text-slate-400">Carboidratos</span><strong class="text-sm text-brandGreen font-mono" id="ai-result-carb">0g</strong></div>
+                        <div class="bg-brandCard p-2 rounded-lg text-center border border-brandBorder"><span class="block text-[9px] text-slate-400">Gorduras</span><strong class="text-sm text-brandPurple font-mono" id="ai-result-fat">0g</strong></div>
                     </div>
                     <p class="text-[10px] text-slate-300 leading-normal mb-3" id="ai-result-explanation"></p>
                     <div class="flex gap-2">
@@ -396,18 +416,18 @@
 
             <div class="flex gap-2 mb-4">
                 <button onclick="openCustomMealModal()" class="flex-1 py-2 bg-brandDark border border-brandBorder rounded-xl text-[10px] font-bold text-slate-300 hover:bg-slate-800 transition-all flex justify-center items-center gap-1 active:scale-95">
-                    <span class="text-sm">🍕</span> Lançar Avulso
+                    <span class="text-sm">ðŸ•</span> LanÃ§ar Avulso
                 </button>
                 <button onclick="openPresetManagerModal()" class="flex-1 py-2 bg-brandDark border border-brandBorder rounded-xl text-[10px] font-bold text-slate-300 hover:bg-slate-800 transition-all flex justify-center items-center gap-1 active:scale-95">
-                    <span class="text-sm">⚙️</span> Atalhos
+                    <span class="text-sm">âš™ï¸</span> Atalhos
                 </button>
             </div>
 
-            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Adicionar Rápido</h3>
+            <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Adicionar RÃ¡pido</h3>
             <div class="grid grid-cols-2 gap-2 mb-5" id="diet-presets-container"></div>
 
             <div class="bg-brandCard/50 border border-brandBorder/50 rounded-2xl p-4">
-                <h3 class="text-[11px] font-bold text-brandGreen uppercase tracking-wider mb-3">Histórico de Hoje</h3>
+                <h3 class="text-[11px] font-bold text-brandGreen uppercase tracking-wider mb-3">HistÃ³rico de Hoje</h3>
                 <div class="flex flex-col gap-2" id="diet-consumed-container"></div>
             </div>
         </section>
@@ -416,7 +436,7 @@
         <section id="tab-metas" class="tab-content">
             <div class="grid grid-cols-3 gap-2 mb-4 bg-brandCard p-1 rounded-xl border border-brandBorder">
                 <button id="sub-btn-curto" onclick="filterMetas('curto')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-white bg-brandBlue active:scale-95">Curto Prazo</button>
-                <button id="sub-btn-medio" onclick="filterMetas('medio')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-slate-400 active:scale-95">Médio Prazo</button>
+                <button id="sub-btn-medio" onclick="filterMetas('medio')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-slate-400 active:scale-95">MÃ©dio Prazo</button>
                 <button id="sub-btn-longo" onclick="filterMetas('longo')" class="sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold text-slate-400 active:scale-95">Longo Prazo</button>
             </div>
 
@@ -432,61 +452,69 @@
             </div>
 
             <div class="bg-emerald-950/10 border border-emerald-900/30 rounded-2xl p-4">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-brandGreen mb-3">🏆 Concluídos</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-brandGreen mb-3">ðŸ† ConcluÃ­dos</h3>
                 <div class="flex flex-col gap-2.5" id="completed-metas-container"></div>
             </div>
         </section>
 
-        <!-- ================= TAB: CONFIGURAÇÕES ================= -->
+        <!-- ================= TAB: CONFIGURAÃ‡Ã•ES ================= -->
         <section id="tab-config" class="tab-content">
             
-            <!-- CONFIGURAÇÃO DA IA (NOVO) -->
+            <!-- CONFIGURAÃ‡ÃƒO DA IA (NOVO) -->
             <div class="bg-brandCard border border-brandBlue/30 rounded-2xl p-5 mb-4 shadow-[0_0_15px_rgba(59,130,246,0.15)] relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-brandBlue text-white text-[8px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Segurança</div>
-                <h3 class="text-sm font-bold text-brandBlue mb-2 flex items-center gap-1.5"><span>🤖</span> Chave da IA (Gemini)</h3>
-                <p class="text-[10px] text-slate-400 mb-3 leading-tight">Cole sua API Key aqui para a inteligência funcionar. Ela fica salva <b>apenas no seu celular</b> e o GitHub nunca vai bloqueá-la.</p>
+                <div class="absolute top-0 right-0 bg-brandBlue text-white text-[8px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">SeguranÃ§a</div>
+                <h3 class="text-sm font-bold text-brandBlue mb-2 flex items-center gap-1.5"><span>ðŸ¤–</span> Chave da IA (Gemini)</h3>
+                <p class="text-[10px] text-slate-400 mb-3 leading-tight">Cole sua API Key aqui para a inteligÃªncia funcionar. Ela fica salva <b>apenas no seu celular</b> e o GitHub nunca vai bloqueÃ¡-la.</p>
                 <input type="password" id="config-api-key" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs mb-3 focus:outline-none focus:border-brandBlue" placeholder="Cole sua chave gerada no Google AI Studio aqui...">
                 <button onclick="saveApiKey()" class="w-full py-2.5 bg-brandBlue text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Salvar Chave Segura</button>
             </div>
 
             <!-- COPIAR PARA WORD -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 text-center shadow-lg">
-                <div class="text-3xl mb-2">📝</div>
+                <div class="text-3xl mb-2">ðŸ“</div>
                 <h3 class="text-sm font-bold text-slate-200 mb-1">Copiar para Word</h3>
-                <p class="text-[10px] text-slate-400 mb-4">Gera a tabela estruturada com metas e agenda em padrão de impressão de relatórios.</p>
+                <p class="text-[10px] text-slate-400 mb-4">Gera a tabela estruturada com metas e agenda em padrÃ£o de impressÃ£o de relatÃ³rios.</p>
                 <button onclick="copyToWord()" class="w-full py-2.5 bg-brandCard border border-brandBlue text-brandBlue font-bold text-xs rounded-xl uppercase tracking-wide active:scale-95 transition-all">
-                    Copiar Formatação
+                    Copiar FormataÃ§Ã£o
                 </button>
             </div>
 
-            <!-- DATA DE INÍCIO DA ESCALA -->
+            <!-- CONFIGURAÃ‡ÃƒO DA ESCALA -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 shadow-lg">
-                <h3 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Ajuste da Escala 6x3</h3>
-                <label class="block text-[10px] text-slate-400 mb-1">Data do Dia 1 (Início do ciclo):</label>
+                <h3 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Ajuste da Escala</h3>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div><label class="block text-[10px] text-slate-400 mb-1">Dias de trabalho</label><input type="number" min="1" max="30" id="scale-work-days" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" onchange="updateScalePattern()"></div>
+                    <div><label class="block text-[10px] text-slate-400 mb-1">Dias de folga</label><input type="number" min="1" max="30" id="scale-off-days" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" onchange="updateScalePattern()"></div>
+                </div>
+                <label class="block text-[10px] text-slate-400 mb-1">Data do Dia 1 (InÃ­cio do ciclo):</label>
                 <input type="date" id="scale-start-input" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs mb-2 focus:outline-none focus:border-brandBlue" onchange="updateScaleDate(this.value)">
-                <p class="text-[9px] text-slate-500">Defina o primeiro dia de trabalho da escala. O app calculará os dias de folga automaticamente.</p>
+                <p class="text-[9px] text-slate-500">Defina o primeiro dia de trabalho da escala. O app calcularÃ¡ os dias de folga automaticamente.</p>
+            </div>
+            <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 shadow-lg">
+                <div class="flex justify-between items-center mb-3"><div><h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Modo FÃ©rias ðŸ–ï¸</h3><p class="text-[9px] text-slate-500 mt-1">Marca o perÃ­odo no calendÃ¡rio e pausa a escala.</p></div><input type="checkbox" id="vacation-enabled" onchange="saveVacationSettings()"></div>
+                <div class="grid grid-cols-2 gap-3"><div><label class="block text-[10px] text-slate-400 mb-1">InÃ­cio</label><input type="date" id="vacation-start" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" onchange="saveVacationSettings()"></div><div><label class="block text-[10px] text-slate-400 mb-1">Fim</label><input type="date" id="vacation-end" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" onchange="saveVacationSettings()"></div></div>
             </div>
 
-            <!-- BACKUP E SEGURANÇA -->
+            <!-- BACKUP E SEGURANÃ‡A -->
             <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 mb-4 shadow-lg">
                 <h3 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Nuvem e Backup</h3>
                 <div class="flex flex-col gap-2">
                     <button onclick="exportBackupData()" class="w-full py-2 bg-brandDark border border-brandBorder text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95">
-                        📥 Exportar Backup
+                        ðŸ“¥ Exportar Backup
                     </button>
                     <label class="w-full py-2 bg-brandDark border border-brandBorder text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-                        📤 Importar Backup <input type="file" id="import-file" class="hidden" onchange="importBackupData(event)">
+                        ðŸ“¤ Importar Backup <input type="file" id="import-file" class="hidden" onchange="importBackupData(event)">
                     </label>
                     <button onclick="triggerResetDefaultConfirm()" class="w-full py-2 border border-brandRed/20 hover:bg-red-950/10 text-brandRed font-semibold text-xs rounded-xl mt-2 active:scale-95">
-                        Restaurar Configurações Originais
+                        Restaurar ConfiguraÃ§Ãµes Originais
                     </button>
                 </div>
             </div>
-            <div class="text-center text-[10px] text-slate-600">Comando Pessoal V7.0 • Executivo RPG e Gamificado</div>
+            <div class="text-center text-[10px] text-slate-600">Comando Pessoal V7.0 â€¢ Executivo RPG e Gamificado</div>
         </section>
     </main>
 
-    <!-- MODAL: CALENDÁRIO -->
+    <!-- MODAL: CALENDÃRIO -->
     <div class="modal" id="calendar-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -496,31 +524,33 @@
             </div>
             <div class="cal-grid mb-2">
                 <div class="cal-header">Dom</div><div class="cal-header">Seg</div><div class="cal-header">Ter</div>
-                <div class="cal-header">Qua</div><div class="cal-header">Qui</div><div class="cal-header">Sex</div><div class="cal-header">Sáb</div>
+                <div class="cal-header">Qua</div><div class="cal-header">Qui</div><div class="cal-header">Sex</div><div class="cal-header">SÃ¡b</div>
             </div>
             <div class="cal-grid" id="calendar-grid-container"></div>
             <div class="mt-4 flex gap-3 justify-center text-[10px] font-bold">
                 <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-500/20 border border-blue-500/40"></span> Trabalho</div>
                 <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-green-500/20 border border-green-500/40"></span> Folga</div>
+                <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-purple-500/20 border border-purple-500/40"></span> FÃ©rias</div>
             </div>
-            <button onclick="closeModal('calendar-modal')" class="w-full mt-5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-brandDark border border-brandBorder active:scale-95">Fechar Calendário</button>
+            <button onclick="closeModal('calendar-modal')" class="w-full mt-5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-brandDark border border-brandBorder active:scale-95">Fechar CalendÃ¡rio</button>
         </div>
     </div>
 
     <!-- MODAL: METAS NUTRICIONAIS -->
     <div class="modal" id="goal-settings-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
-            <h3 class="text-sm font-bold text-white mb-4">⚙️ Metas Diárias</h3>
+            <h3 class="text-sm font-bold text-white mb-4">âš™ï¸ Metas DiÃ¡rias</h3>
             <div class="mb-3">
                 <label class="block text-[10px] text-slate-400 mb-1">Meta de Calorias (kcal)</label>
                 <input type="number" id="goal-modal-cal" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 2500">
             </div>
             <div class="mb-3">
-                <label class="block text-[10px] text-slate-400 mb-1">Meta de Proteínas (g)</label>
+                <label class="block text-[10px] text-slate-400 mb-1">Meta de ProteÃ­nas (g)</label>
                 <input type="number" id="goal-modal-prot" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 160">
             </div>
+            <div class="grid grid-cols-2 gap-3 mb-3"><div><label class="block text-[10px] text-slate-400 mb-1">Carboidratos (g)</label><input type="number" id="goal-modal-carb" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 250"></div><div><label class="block text-[10px] text-slate-400 mb-1">Gorduras (g)</label><input type="number" id="goal-modal-fat" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 70"></div></div>
             <div class="mb-4">
-                <label class="block text-[10px] text-slate-400 mb-1">Meta de Água (ml)</label>
+                <label class="block text-[10px] text-slate-400 mb-1">Meta de Ãgua (ml)</label>
                 <input type="number" id="goal-modal-water" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs font-mono font-bold" placeholder="Ex: 3500">
             </div>
             <div class="flex justify-end gap-2">
@@ -535,22 +565,9 @@
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
             <h3 class="text-sm font-bold text-white mb-4" id="task-modal-title">Nova Tarefa</h3>
             <input type="hidden" id="task-modal-id">
-            <div class="mb-3">
-                <label class="block text-[10px] text-slate-400 mb-1">Horário Visível</label>
-                <input type="text" id="task-modal-time" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" placeholder="Ex: 15:00 - 16:30">
-            </div>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                    <label class="block text-[10px] text-slate-400 mb-1">Início Numérico</label>
-                    <input type="number" id="task-modal-start" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" placeholder="Ex: 1500">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 mb-1">Fim Numérico</label>
-                    <input type="number" id="task-modal-end" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs" placeholder="Ex: 1630">
-                </div>
-            </div>
+            <div class="mb-3"><label class="block text-[10px] text-slate-400 mb-1">PerÃ­odo</label><select id="task-modal-period" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs"><option value="manha">ManhÃ£ â˜€ï¸</option><option value="tarde">Tarde ðŸŒ¤ï¸</option><option value="noite">Noite ðŸŒ™</option></select></div>
             <div class="mb-4">
-                <label class="block text-[10px] text-slate-400 mb-1">Descrição</label>
+                <label class="block text-[10px] text-slate-400 mb-1">DescriÃ§Ã£o</label>
                 <textarea id="task-modal-text" rows="2" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2 text-white text-xs"></textarea>
             </div>
             <div class="flex justify-end gap-2">
@@ -563,13 +580,14 @@
     <!-- MODAL: NOVA META -->
     <div class="modal" id="new-meta-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
-            <h3 class="text-sm font-bold text-white mb-4">🎯 Adicionar Novo Objetivo</h3>
+            <h3 class="text-sm font-bold text-white mb-4" id="meta-modal-title">ðŸŽ¯ Adicionar Novo Objetivo</h3>
+            <input type="hidden" id="meta-modal-id">
             <div class="mb-3">
-                <label class="block text-[10px] text-slate-400 mb-1">O que você planeja alcançar?</label>
-                <textarea id="new-meta-text-input" rows="3" class="w-full bg-brandDark border border-brandBorder rounded-lg p-3 text-white text-xs focus:outline-none focus:border-brandBlue" placeholder="Ex: Garantir o bloco mínimo no Descomplica..."></textarea>
+                <label class="block text-[10px] text-slate-400 mb-1">O que vocÃª planeja alcanÃ§ar?</label>
+                <textarea id="new-meta-text-input" rows="3" class="w-full bg-brandDark border border-brandBorder rounded-lg p-3 text-white text-xs focus:outline-none focus:border-brandBlue" placeholder="Ex: Garantir o bloco mÃ­nimo no Descomplica..."></textarea>
             </div>
             <div class="mb-4">
-                <label class="block text-[10px] text-slate-400 mb-1">Subtarefas táticas (separadas por vírgula, opcional)</label>
+                <label class="block text-[10px] text-slate-400 mb-1">Subtarefas tÃ¡ticas (separadas por vÃ­rgula, opcional)</label>
                 <input type="text" id="new-meta-subtasks-input" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Baixar provas, Fazer simulado">
             </div>
             <div class="flex justify-end gap-2">
@@ -579,13 +597,13 @@
         </div>
     </div>
 
-    <!-- MODAL: REFEIÇÃO AVULSA -->
+    <!-- MODAL: REFEIÃ‡ÃƒO AVULSA -->
     <div class="modal" id="custom-meal-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
-            <h3 class="text-sm font-bold text-white mb-4">Adicionar Refeição Avulsa</h3>
+            <h3 class="text-sm font-bold text-white mb-4">Adicionar RefeiÃ§Ã£o Avulsa</h3>
             <div class="mb-3">
                 <label class="block text-[10px] text-slate-400 mb-1">Nome da Comida</label>
-                <input type="text" id="custom-meal-name" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 2 Pedaços de Pizza">
+                <input type="text" id="custom-meal-name" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 2 PedaÃ§os de Pizza">
             </div>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
@@ -593,10 +611,11 @@
                     <input type="number" id="custom-meal-cal" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 600">
                 </div>
                 <div>
-                    <label class="block text-[10px] text-slate-400 mb-1">Proteínas (g)</label>
+                    <label class="block text-[10px] text-slate-400 mb-1">ProteÃ­nas (g)</label>
                     <input type="number" id="custom-meal-prot" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 15">
                 </div>
             </div>
+            <div class="grid grid-cols-2 gap-3 mb-4"><div><label class="block text-[10px] text-slate-400 mb-1">Carboidratos (g)</label><input type="number" id="custom-meal-carb" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 70"></div><div><label class="block text-[10px] text-slate-400 mb-1">Gorduras (g)</label><input type="number" id="custom-meal-fat" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs" placeholder="Ex: 20"></div></div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeModal('custom-meal-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark">Cancelar</button>
                 <button onclick="saveCustomMeal()" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandOrange active:scale-95">Adicionar</button>
@@ -607,16 +626,19 @@
     <!-- MODAL: GERENCIAR PRESETS -->
     <div class="modal" id="preset-manager-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm flex flex-col shadow-2xl" style="max-height: 85vh;">
-            <h3 class="text-sm font-bold text-white mb-3">Gerenciar Botões Rápidos</h3>
+            <h3 class="text-sm font-bold text-white mb-3">Gerenciar BotÃµes RÃ¡pidos</h3>
             <div class="flex-1 overflow-y-auto custom-scroll pr-1 mb-4 border border-brandBorder rounded-lg bg-brandDark p-2 flex flex-col gap-2" id="preset-list-container"></div>
             <div class="bg-brandDark border border-brandBorder p-3 rounded-xl">
-                <h4 class="text-[10px] font-bold text-brandBlue mb-2 uppercase">Criar Novo Botão</h4>
-                <input type="text" id="new-preset-name" class="w-full bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs mb-2 focus:outline-none focus:border-brandBlue" placeholder="Nome (Ex: Pão de Queijo)">
-                <div class="flex gap-2 mb-2">
-                    <input type="number" id="new-preset-cal" class="w-1/2 bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Calorias">
-                    <input type="number" id="new-preset-prot" class="w-1/2 bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Proteínas (g)">
+                <h4 class="text-[10px] font-bold text-brandBlue mb-2 uppercase">Criar Novo BotÃ£o</h4>
+                <input type="hidden" id="new-preset-id">
+                <input type="text" id="new-preset-name" class="w-full bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs mb-2 focus:outline-none focus:border-brandBlue" placeholder="Nome (Ex: PÃ£o de Queijo)">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="number" id="new-preset-cal" class="bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Calorias">
+                    <input type="number" id="new-preset-prot" class="bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="ProteÃ­nas (g)">
+                    <input type="number" id="new-preset-carb" class="bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Carboidratos (g)">
+                    <input type="number" id="new-preset-fat" class="bg-brandCard border border-brandBorder rounded-md p-1.5 text-white text-xs focus:outline-none" placeholder="Gorduras (g)">
                 </div>
-                <button onclick="saveNewPreset()" class="w-full py-2 bg-brandBlue text-white font-bold text-xs rounded-lg active:scale-95">Salvar Novo Botão</button>
+                <button onclick="saveNewPreset()" id="save-preset-button" class="w-full py-2 bg-brandBlue text-white font-bold text-xs rounded-lg active:scale-95">Salvar Novo BotÃ£o</button>
             </div>
             <button onclick="closeModal('preset-manager-modal')" class="w-full mt-3 px-4 py-2 rounded-lg text-xs font-bold text-slate-300 bg-brandDark border border-brandBorder active:scale-95">Fechar</button>
         </div>
@@ -625,27 +647,27 @@
     <!-- MODAL: NOVO COMPROMISSO (AGENDA) -->
     <div class="modal" id="agenda-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
-            <h3 class="text-sm font-bold text-white mb-4">📅 Novo Compromisso</h3>
+            <h3 class="text-sm font-bold text-white mb-4" id="agenda-modal-title">ðŸ“… Novo Compromisso</h3><input type="hidden" id="agenda-id">
             <div class="mb-3">
-                <label class="block text-[10px] text-slate-400 mb-1">Título do Evento</label>
-                <input type="text" id="agenda-title" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Casamento do meu irmão">
+                <label class="block text-[10px] text-slate-400 mb-1">TÃ­tulo do Evento</label>
+                <input type="text" id="agenda-title" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Casamento do meu irmÃ£o">
             </div>
             <div class="mb-3">
-                <label class="block text-[10px] text-slate-400 mb-1">Data</label>
+                <label class="block text-[10px] text-slate-400 mb-1">Data <span class="text-slate-600">(opcional)</span></label>
                 <input type="date" id="agenda-date" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none">
             </div>
             <div class="mb-3">
                 <label class="block text-[10px] text-slate-400 mb-1">Categoria</label>
                 <select id="agenda-category" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none">
-                    <option value="Pessoal">Pessoal 🙋‍♂️</option>
-                    <option value="Saúde">Saúde 🩺</option>
-                    <option value="Financeiro">Financeiro 💸</option>
-                    <option value="Trabalho">Trabalho 🏢</option>
-                    <option value="Estudo">Estudo 📚</option>
+                    <option value="Pessoal">Pessoal ðŸ™‹â€â™‚ï¸</option>
+                    <option value="SaÃºde">SaÃºde ðŸ©º</option>
+                    <option value="Financeiro">Financeiro ðŸ’¸</option>
+                    <option value="Trabalho">Trabalho ðŸ¢</option>
+                    <option value="Estudo">Estudo ðŸ“š</option>
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block text-[10px] text-slate-400 mb-1">Subtarefas iniciais (separadas por vírgula)</label>
+                <label class="block text-[10px] text-slate-400 mb-1">Subtarefas iniciais (separadas por vÃ­rgula)</label>
                 <input type="text" id="agenda-subtasks" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none" placeholder="Ex: Comprar terno, Comprar presente">
             </div>
             <div class="flex justify-end gap-2">
@@ -660,12 +682,12 @@
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm flex flex-col shadow-2xl" style="max-height: 85vh;">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-1.5">
-                    <span>🏆 Tiers de Autodisciplina</span>
+                    <span>ðŸ† Tiers de Autodisciplina</span>
                 </h3>
             </div>
-            <p class="text-[10px] text-slate-400 mb-4 leading-tight">Suba de nível completando obrigações, hábitos diários e prazos na sua agenda para evoluir sua patente de comando!</p>
+            <p class="text-[10px] text-slate-400 mb-4 leading-tight">Suba de nÃ­vel completando obrigaÃ§Ãµes, hÃ¡bitos diÃ¡rios e prazos na sua agenda para evoluir sua patente de comando!</p>
             
-            <!-- Lista Dinâmica de Tiers -->
+            <!-- Lista DinÃ¢mica de Tiers -->
             <div class="flex-1 overflow-y-auto custom-scroll pr-1 mb-4 flex flex-col gap-2.5" id="ranks-list-container"></div>
             
             <button onclick="closeModal('ranks-modal')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-brandDark border border-brandBorder active:scale-95">Fechar Painel</button>
@@ -675,9 +697,9 @@
     <!-- MODAL: ADICIONAR SUBTAREFA (META OU AGENDA) -->
     <div class="modal" id="add-subtask-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm shadow-2xl">
-            <h3 class="text-sm font-bold text-white mb-4">➕ Adicionar Etapa</h3>
+            <h3 class="text-sm font-bold text-white mb-4">âž• Adicionar Etapa</h3>
             <div class="mb-4">
-                <label class="block text-[10px] text-slate-400 mb-1">Descreva o passo/ação</label>
+                <label class="block text-[10px] text-slate-400 mb-1">Descreva o passo/aÃ§Ã£o</label>
                 <input type="text" id="subtask-modal-text" class="w-full bg-brandDark border border-brandBorder rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brandBlue" placeholder="Ex: Baixar provas do Enem" onkeydown="if(event.key==='Enter'){saveSubtaskModal();}">
             </div>
             <div class="flex justify-end gap-2">
@@ -687,14 +709,14 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMAÇÃO (SEM BROWSER ALERTS) -->
+    <!-- MODAL DE CONFIRMAÃ‡ÃƒO (SEM BROWSER ALERTS) -->
     <div class="modal" id="confirm-modal">
         <div class="bg-brandCard border border-brandBorder rounded-2xl p-5 w-11/12 max-w-sm text-center shadow-2xl">
-            <div class="text-3xl mb-2">⚠️</div>
-            <h3 class="text-sm font-bold text-white mb-2">Ação Irreversível</h3>
-            <p class="text-xs text-slate-400 mb-5" id="confirm-modal-description">Deseja realmente realizar esta ação?</p>
+            <div class="text-3xl mb-2">âš ï¸</div>
+            <h3 class="text-sm font-bold text-white mb-2">AÃ§Ã£o IrreversÃ­vel</h3>
+            <p class="text-xs text-slate-400 mb-5" id="confirm-modal-description">Deseja realmente realizar esta aÃ§Ã£o?</p>
             <div class="flex gap-3 justify-center">
-                <button onclick="closeModal('confirm-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark w-24 active:scale-95">Não</button>
+                <button onclick="closeModal('confirm-modal')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 bg-brandDark w-24 active:scale-95">NÃ£o</button>
                 <button id="confirm-modal-ok-btn" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brandRed w-24 active:scale-95">Sim</button>
             </div>
         </div>
@@ -705,77 +727,82 @@
         // ================= DADOS E ESTADO DA CENTRAL =================
         const defaultRoutines = {
             A: [
-                { id: 1, time: "05:00 - 05:30", start: 500, end: 530, text: "Acordar, Higiene, Café (2 Fatias, Queijo, Leite), Creatina.", done: false },
+                { id: 1, time: "05:00 - 05:30", start: 500, end: 530, text: "Acordar, Higiene, CafÃ© (2 Fatias, Queijo, Leite), Creatina.", done: false },
                 { id: 2, time: "06:00 - 15:00", start: 600, end: 1500, text: "Foco Profissional CPFL.", done: false },
                 { id: 3, time: "15:10 - 15:50", start: 1510, end: 1550, text: "Deslocamento Fz15 p/ Valinhos.", done: false },
                 { id: 4, time: "16:20 - 18:00", start: 1620, end: 1800, text: "Treino Pesado + Cardio (Esporte Side).", done: false },
-                { id: 5, time: "18:30 - 19:00", start: 1830, end: 1900, text: "Banho & Janta da Dieta (Marmita da Mãe).", done: false },
-                { id: 6, time: "19:00 - 19:05", start: 1900, end: 1905, text: "Manutenção Ofensiva Duolingo.", done: false },
+                { id: 5, time: "18:30 - 19:00", start: 1830, end: 1900, text: "Banho & Janta da Dieta (Marmita da MÃ£e).", done: false },
+                { id: 6, time: "19:00 - 19:05", start: 1900, end: 1905, text: "ManutenÃ§Ã£o Ofensiva Duolingo.", done: false },
                 { id: 7, time: "19:05 - 20:00", start: 1905, end: 2000, text: "Estudos Descomplica (Mackenzie).", done: false },
                 { id: 8, time: "20:00 - 22:30", start: 2000, end: 2230, text: "Lazer Livre (PC Gamer / Projetor).", done: false }
             ],
             B: [
-                { id: 11, time: "05:00 - 05:30", start: 500, end: 530, text: "Acordar, Higiene, Café, Creatina.", done: false },
+                { id: 11, time: "05:00 - 05:30", start: 500, end: 530, text: "Acordar, Higiene, CafÃ©, Creatina.", done: false },
                 { id: 12, time: "06:00 - 15:00", start: 600, end: 1500, text: "Foco Profissional CPFL.", done: false },
                 { id: 13, time: "15:10 - 15:50", start: 1510, end: 1550, text: "Deslocamento Fz15 p/ Valinhos.", done: false },
-                { id: 14, time: "16:00 - 17:30", start: 1600, end: 1730, text: "Estudo Avançado (Descomplica Extra).", done: false },
+                { id: 14, time: "16:00 - 17:30", start: 1600, end: 1730, text: "Estudo AvanÃ§ado (Descomplica Extra).", done: false },
                 { id: 15, time: "18:00 - 23:00", start: 1800, end: 2300, text: "Lazer de Fim de Semana (Taquaral / PC Gamer).", done: false }
             ],
             C: [
-                { id: 21, time: "07:00 - 08:30", start: 700, end: 830, text: "Acordar S/ Despertador + Café Reforçado.", done: false },
-                { id: 22, time: "08:30 - 11:30", start: 830, end: 1130, text: "Bico de Elétrica ou Estudo Pesado.", done: false },
-                { id: 23, time: "11:30 - 13:00", start: 1130, end: 1300, text: "Almoço Dieta.", done: false },
-                { id: 24, time: "13:00 - 15:00", start: 1300, end: 1500, text: "Revisão Descomplica.", done: false },
-                { id: 25, time: "15:30 - 17:00", start: 1530, end: 1700, text: "Treino Pesado (Horário Nobre Vazio).", done: false },
+                { id: 21, time: "07:00 - 08:30", start: 700, end: 830, text: "Acordar S/ Despertador + CafÃ© ReforÃ§ado.", done: false },
+                { id: 22, time: "08:30 - 11:30", start: 830, end: 1130, text: "Bico de ElÃ©trica ou Estudo Pesado.", done: false },
+                { id: 23, time: "11:30 - 13:00", start: 1130, end: 1300, text: "AlmoÃ§o Dieta.", done: false },
+                { id: 24, time: "13:00 - 15:00", start: 1300, end: 1500, text: "RevisÃ£o Descomplica.", done: false },
+                { id: 25, time: "15:30 - 17:00", start: 1530, end: 1700, text: "Treino Pesado (HorÃ¡rio Nobre Vazio).", done: false },
                 { id: 26, time: "18:00 - 23:00", start: 1800, end: 2300, text: "Descanso / PC Gamer.", done: false }
             ],
             D: [
-                { id: 31, time: "08:00 - 10:00", start: 800, end: 1000, text: "Acordar tranquilo, Café padrão.", done: false },
-                { id: 32, time: "10:00 - 14:00", start: 1000, end: 1400, text: "Lazer matinal / Almoço Livre.", done: false },
-                { id: 33, time: "14:00 - 16:00", start: 1400, end: 1600, text: "Manutenção Vida (Compras, organizar quarto).", done: false },
-                { id: 34, time: "16:00 - 24:00", start: 1600, end: 2400, text: "Respiro Total, Água de Coco no Taquaral, Jogos.", done: false }
+                { id: 31, time: "08:00 - 10:00", start: 800, end: 1000, text: "Acordar tranquilo, CafÃ© padrÃ£o.", done: false },
+                { id: 32, time: "10:00 - 14:00", start: 1000, end: 1400, text: "Lazer matinal / AlmoÃ§o Livre.", done: false },
+                { id: 33, time: "14:00 - 16:00", start: 1400, end: 1600, text: "ManutenÃ§Ã£o Vida (Compras, organizar quarto).", done: false },
+                { id: 34, time: "16:00 - 24:00", start: 1600, end: 2400, text: "Respiro Total, Ãgua de Coco no Taquaral, Jogos.", done: false }
             ]
         };
 
         const defaultDietPresets = [
-            { id: 1, name: '🍞 Café Padrão (Pão, Queijo, Leite c/ Café)', cal: 350, prot: 18 },
-            { id: 2, name: '🍛 Almoço Marmita (Frango, Arroz, Salada)', cal: 600, prot: 45 },
-            { id: 3, name: '🥛 Pré/Pós Treino (Whey + Fruta)', cal: 220, prot: 25 },
-            { id: 4, name: '🍲 Janta Dieta (Carne, Carbo, Legume)', cal: 550, prot: 40 },
-            { id: 5, name: '🍳 Ovos Mexidos (3 ovos)', cal: 210, prot: 18 }
+            { id: 1, name: 'ðŸž CafÃ© PadrÃ£o (PÃ£o, Queijo, Leite c/ CafÃ©)', cal: 350, prot: 18, carb: 42, fat: 12 },
+            { id: 2, name: 'ðŸ› AlmoÃ§o Marmita (Frango, Arroz, Salada)', cal: 600, prot: 45, carb: 65, fat: 18 },
+            { id: 3, name: 'ðŸ¥› PrÃ©/PÃ³s Treino (Whey + Fruta)', cal: 220, prot: 25, carb: 27, fat: 2 },
+            { id: 4, name: 'ðŸ² Janta Dieta (Carne, Carbo, Legume)', cal: 550, prot: 40, carb: 55, fat: 18 },
+            { id: 5, name: 'ðŸ³ Ovos Mexidos (3 ovos)', cal: 210, prot: 18, carb: 1, fat: 15 }
         ];
 
         let appState = {
             scaleStartDate: '2026-06-07',
+            scaleWorkDays: 6,
+            scaleOffDays: 3,
+            vacation: { enabled: false, start: '', end: '' },
             currentMode: 'A',
             lastResetDate: '',
             selectedMetaTab: 'curto',
-            geminiApiKey: '', // NOVA VARIÁVEL PARA SALVAR A CHAVE
+            geminiApiKey: '', // NOVA VARIÃVEL PARA SALVAR A CHAVE
             routines: JSON.parse(JSON.stringify(defaultRoutines)),
             diet: { 
                 targetCal: 2500, 
                 targetProt: 160, 
+                targetCarb: 250,
+                targetFat: 70,
                 presets: [...defaultDietPresets], 
                 consumed: [],
                 waterTarget: 3500,
                 waterConsumed: 0
             },
             metas: [
-                { id: 1, type: 'curto', text: 'Garantir o bloco mínimo no Descomplica com foco no Enem.', done: false, subtasks: [] },
+                { id: 1, type: 'curto', text: 'Garantir o bloco mÃ­nimo no Descomplica com foco no Enem.', done: false, subtasks: [] },
                 { id: 2, type: 'curto', text: 'Preservar a ofensiva de mais de 1.200 dias no Duolingo.', done: false, subtasks: [] },
-                { id: 3, type: 'curto', text: 'Operar estritamente na janela matinal (até 11h40) na CPFL.', done: false, subtasks: [] },
+                { id: 3, type: 'curto', text: 'Operar estritamente na janela matinal (atÃ© 11h40) na CPFL.', done: false, subtasks: [] },
                 { id: 4, type: 'medio', text: 'Prestar o Enem em Novembro de 2026.', done: false, subtasks: [] },
                 { id: 5, type: 'medio', text: 'Retornar operacional do trade com 2 contratos.', done: false, subtasks: [] },
-                { id: 6, type: 'medio', text: 'Quitar integralmente cartões de crédito Nubank e Itaú.', done: false, subtasks: [] },
-                { id: 7, type: 'longo', text: 'Concluir bacharelado em Administração na Mackenzie (2030/2031).', done: false, subtasks: [] },
-                { id: 8, type: 'longo', text: 'Atingir o patamar estável de R$ 10.000 alocados no Trade.', done: false, subtasks: [] },
-                { id: 9, type: 'longo', text: 'Consolidar o percentual de gordura ideal para a definição estrita do abdômen.', done: false, subtasks: [] }
+                { id: 6, type: 'medio', text: 'Quitar integralmente cartÃµes de crÃ©dito Nubank e ItaÃº.', done: false, subtasks: [] },
+                { id: 7, type: 'longo', text: 'Concluir bacharelado em AdministraÃ§Ã£o na Mackenzie (2030/2031).', done: false, subtasks: [] },
+                { id: 8, type: 'longo', text: 'Atingir o patamar estÃ¡vel de R$ 10.000 alocados no Trade.', done: false, subtasks: [] },
+                { id: 9, type: 'longo', text: 'Consolidar o percentual de gordura ideal para a definiÃ§Ã£o estrita do abdÃ´men.', done: false, subtasks: [] }
             ],
             agenda: [
-                { id: 101, title: "Casamento do meu irmão (comprar terno e presente)", date: "2026-07-20", category: "Pessoal", done: false, subtasks: [{ id: 1001, text: "Comprar terno de padrinho", done: false }, { id: 1002, text: "Pesquisar presentes de casamento", done: false }] },
-                { id: 102, title: "Consulta médica de rotina", date: "2026-06-30", category: "Saúde", done: false, subtasks: [] }
+                { id: 101, title: "Casamento do meu irmÃ£o (comprar terno e presente)", date: "2026-07-20", category: "Pessoal", done: false, subtasks: [{ id: 1001, text: "Comprar terno de padrinho", done: false }, { id: 1002, text: "Pesquisar presentes de casamento", done: false }] },
+                { id: 102, title: "Consulta mÃ©dica de rotina", date: "2026-06-30", category: "SaÃºde", done: false, subtasks: [] }
             ],
-            // Gamificação RPG
+            // GamificaÃ§Ã£o RPG
             xp: 0,
             level: 1,
             streak: 0,
@@ -812,7 +839,7 @@
             }
         };
 
-        // ================= FUNÇÃO DA CHAVE DA IA =================
+        // ================= FUNÃ‡ÃƒO DA CHAVE DA IA =================
         function saveApiKey() {
             const keyInput = document.getElementById('config-api-key').value.trim();
             if (!keyInput) {
@@ -821,7 +848,7 @@
             }
             appState.geminiApiKey = keyInput;
             saveToStorage();
-            showToast("Chave da IA salva com sucesso! 🤖");
+            showToast("Chave da IA salva com sucesso! ðŸ¤–");
         }
 
         // ================= MODAL UNIFICADO DE SUBTAREFAS (META OU AGENDA) =================
@@ -835,7 +862,7 @@
         function saveSubtaskModal() {
             const text = document.getElementById('subtask-modal-text').value.trim();
             if (!text) {
-                showToast("Digite uma descrição para a etapa.");
+                showToast("Digite uma descriÃ§Ã£o para a etapa.");
                 return;
             }
 
@@ -864,27 +891,27 @@
             closeModal('add-subtask-modal');
         }
 
-        // ================= SISTEMA DE XP, NÍVEL E TÍTULOS (GAMIFICAÇÃO) =================
+        // ================= SISTEMA DE XP, NÃVEL E TÃTULOS (GAMIFICAÃ‡ÃƒO) =================
         function getRank(lvl) {
-            if (lvl >= 35) return { title: "Avatar Mítico 🌌", color: "text-brandPurple font-black" };
-            if (lvl >= 30) return { title: "Lenda Suprema 👑", color: "text-brandPurple font-bold" };
-            if (lvl >= 25) return { title: "Guerreiro Épico 🌀", color: "text-brandCyan font-bold" };
-            if (lvl >= 20) return { title: "Comandante de Elite 🎖️", color: "text-brandBlue font-bold" };
-            if (lvl >= 15) return { title: "Guerreiro Implacável 🔥", color: "text-brandOrange font-bold" };
-            if (lvl >= 10) return { title: "Combatente de Aço ⚔️", color: "text-brandGreen font-bold" };
-            if (lvl >= 5) return { title: "Iniciado Disciplinado ⚡", color: "text-slate-300 font-bold" };
-            return { title: "Recruta Neófito 🛡️", color: "text-slate-400 font-medium" };
+            if (lvl >= 35) return { title: "Avatar MÃ­tico ðŸŒŒ", color: "text-brandPurple font-black" };
+            if (lvl >= 30) return { title: "Lenda Suprema ðŸ‘‘", color: "text-brandPurple font-bold" };
+            if (lvl >= 25) return { title: "Guerreiro Ã‰pico ðŸŒ€", color: "text-brandCyan font-bold" };
+            if (lvl >= 20) return { title: "Comandante de Elite ðŸŽ–ï¸", color: "text-brandBlue font-bold" };
+            if (lvl >= 15) return { title: "Guerreiro ImplacÃ¡vel ðŸ”¥", color: "text-brandOrange font-bold" };
+            if (lvl >= 10) return { title: "Combatente de AÃ§o âš”ï¸", color: "text-brandGreen font-bold" };
+            if (lvl >= 5) return { title: "Iniciado Disciplinado âš¡", color: "text-slate-300 font-bold" };
+            return { title: "Recruta NeÃ³fito ðŸ›¡ï¸", color: "text-slate-400 font-medium" };
         }
 
         const rpgTiersList = [
-            { minLvl: 1, maxLvl: 4, name: "Recruta Neófito 🛡️", color: "text-slate-400", bg: "bg-slate-900/40" },
-            { minLvl: 5, maxLvl: 9, name: "Iniciado Disciplinado ⚡", color: "text-slate-300", bg: "bg-slate-800/40" },
-            { minLvl: 10, maxLvl: 14, name: "Combatente de Aço ⚔️", color: "text-brandGreen", bg: "bg-emerald-950/20" },
-            { minLvl: 15, maxLvl: 19, name: "Guerreiro Implacável 🔥", color: "text-brandOrange", bg: "bg-amber-950/20" },
-            { minLvl: 20, maxLvl: 24, name: "Comandante de Elite 🎖️", color: "text-brandBlue", bg: "bg-blue-950/20" },
-            { minLvl: 25, maxLvl: 29, name: "Guerreiro Épico 🌀", color: "text-brandCyan", bg: "bg-cyan-950/20" },
-            { minLvl: 30, maxLvl: 34, name: "Lenda Suprema 👑", color: "text-brandPurple", bg: "bg-purple-950/20" },
-            { minLvl: 35, maxLvl: 999, name: "Avatar Mítico 🌌", color: "text-brandPurple font-black", bg: "bg-gradient-to-r from-purple-950/30 to-blue-950/30" }
+            { minLvl: 1, maxLvl: 4, name: "Recruta NeÃ³fito ðŸ›¡ï¸", color: "text-slate-400", bg: "bg-slate-900/40" },
+            { minLvl: 5, maxLvl: 9, name: "Iniciado Disciplinado âš¡", color: "text-slate-300", bg: "bg-slate-800/40" },
+            { minLvl: 10, maxLvl: 14, name: "Combatente de AÃ§o âš”ï¸", color: "text-brandGreen", bg: "bg-emerald-950/20" },
+            { minLvl: 15, maxLvl: 19, name: "Guerreiro ImplacÃ¡vel ðŸ”¥", color: "text-brandOrange", bg: "bg-amber-950/20" },
+            { minLvl: 20, maxLvl: 24, name: "Comandante de Elite ðŸŽ–ï¸", color: "text-brandBlue", bg: "bg-blue-950/20" },
+            { minLvl: 25, maxLvl: 29, name: "Guerreiro Ã‰pico ðŸŒ€", color: "text-brandCyan", bg: "bg-cyan-950/20" },
+            { minLvl: 30, maxLvl: 34, name: "Lenda Suprema ðŸ‘‘", color: "text-brandPurple", bg: "bg-purple-950/20" },
+            { minLvl: 35, maxLvl: 999, name: "Avatar MÃ­tico ðŸŒŒ", color: "text-brandPurple font-black", bg: "bg-gradient-to-r from-purple-950/30 to-blue-950/30" }
         ];
 
         function addXP(amount) {
@@ -906,7 +933,7 @@
 
             if (leveledUp) {
                 const rank = getRank(appState.level);
-                showToast(`🚀 NOVO NÍVEL ALCANÇADO: Nível ${appState.level} (${rank.title})!`);
+                showToast(`ðŸš€ NOVO NÃVEL ALCANÃ‡ADO: NÃ­vel ${appState.level} (${rank.title})!`);
             }
             saveToStorage();
             renderGamification();
@@ -928,7 +955,7 @@
             const xpBarEl = document.getElementById("rpg-xp-bar");
             const xpTextEl = document.getElementById("rpg-xp-text");
 
-            if (levelEl) levelEl.innerText = `Nível ${level}`;
+            if (levelEl) levelEl.innerText = `NÃ­vel ${level}`;
             if (rankEl) {
                 rankEl.innerText = rank.title;
                 rankEl.className = `text-[10px] uppercase font-black tracking-wide ${rank.color}`;
@@ -956,12 +983,12 @@
                 if (isCurrent) {
                     statusBadge = `<span class="text-[8px] font-black uppercase text-brandBlue bg-brandBlue/10 border border-brandBlue/30 px-2 py-0.5 rounded-full">Atual</span>`;
                 } else if (isUnlocked) {
-                    statusBadge = `<span class="text-[8px] font-bold text-brandGreen">Liberado ✓</span>`;
+                    statusBadge = `<span class="text-[8px] font-bold text-brandGreen">Liberado âœ“</span>`;
                 } else {
-                    statusBadge = `<span class="text-[8px] font-bold text-slate-500">Nível ${t.minLvl} 🔒</span>`;
+                    statusBadge = `<span class="text-[8px] font-bold text-slate-500">NÃ­vel ${t.minLvl} ðŸ”’</span>`;
                 }
 
-                const lvlRangeText = t.maxLvl === 999 ? `Nível ${t.minLvl}+` : `Nível ${t.minLvl} - ${t.maxLvl}`;
+                const lvlRangeText = t.maxLvl === 999 ? `NÃ­vel ${t.minLvl}+` : `NÃ­vel ${t.minLvl} - ${t.maxLvl}`;
 
                 const div = document.createElement('div');
                 div.className = `flex flex-col p-3.5 rounded-xl border ${borderClass} ${t.bg} ${opacityClass} transition-all`;
@@ -986,7 +1013,7 @@
             const freezes = appState.freezes || 0;
 
             if (freezes >= 3) {
-                showToast("❄️ Limite máximo de 3 Gelinhos atingido!");
+                showToast("â„ï¸ Limite mÃ¡ximo de 3 Gelinhos atingido!");
                 return;
             }
 
@@ -1002,13 +1029,13 @@
                 appState.freezes = freezes + 1;
                 saveToStorage();
                 renderAll();
-                showToast("❄️ Gelinho Adquirido! Sequência protegida.");
+                showToast("â„ï¸ Gelinho Adquirido! SequÃªncia protegida.");
             } else {
-                showToast("⚠️ XP Insuficiente! Você precisa de pelo menos 200 XP acumulados.");
+                showToast("âš ï¸ XP Insuficiente! VocÃª precisa de pelo menos 200 XP acumulados.");
             }
         }
 
-        // ================= INICIALIZAÇÃO DE DADOS =================
+        // ================= INICIALIZAÃ‡ÃƒO DE DADOS =================
         window.onload = function() {
             try {
                 if(safeStorage.getItem('planner_v7_rpg')) {
@@ -1021,7 +1048,7 @@
                     saveToStorage();
                 }
             } catch (e) {
-                console.warn('Não foi possível carregar dados salvos, iniciando com padrões:', e);
+                console.warn('NÃ£o foi possÃ­vel carregar dados salvos, iniciando com padrÃµes:', e);
             }
             
             appState.metas.forEach(m => {
@@ -1032,10 +1059,27 @@
             if (appState.streak === undefined) appState.streak = 0;
             if (appState.freezes === undefined) appState.freezes = 0;
             if (appState.geminiApiKey === undefined) appState.geminiApiKey = '';
+            if (!appState.scaleWorkDays) appState.scaleWorkDays = 6;
+            if (!appState.scaleOffDays) appState.scaleOffDays = 3;
+            if (!appState.vacation) appState.vacation = { enabled: false, start: '', end: '' };
+            if (!appState.diet.targetCarb) appState.diet.targetCarb = 250;
+            if (!appState.diet.targetFat) appState.diet.targetFat = 70;
+            [...(appState.diet.presets || []), ...(appState.diet.consumed || [])].forEach(item => {
+                if (item.carb === undefined) item.carb = 0;
+                if (item.fat === undefined) item.fat = 0;
+            });
+            Object.values(appState.routines).flat().forEach(task => {
+                if (!task.period) task.period = (task.start || 0) < 1200 ? 'manha' : (task.start || 0) < 1800 ? 'tarde' : 'noite';
+            });
 
             checkDailyReset();
             document.getElementById('scale-start-input').value = appState.scaleStartDate;
-            document.getElementById('config-api-key').value = appState.geminiApiKey; // Preenche o campo da chave se já existir
+            document.getElementById('scale-work-days').value = appState.scaleWorkDays;
+            document.getElementById('scale-off-days').value = appState.scaleOffDays;
+            document.getElementById('vacation-enabled').checked = appState.vacation.enabled;
+            document.getElementById('vacation-start').value = appState.vacation.start || '';
+            document.getElementById('vacation-end').value = appState.vacation.end || '';
+            document.getElementById('config-api-key').value = appState.geminiApiKey; // Preenche o campo da chave se jÃ¡ existir
             
             calculateScale();
             renderAll();
@@ -1045,7 +1089,7 @@
             /*
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('service-worker.js').catch(() => {
-                    console.warn('Service worker não pôde ser registrado.');
+                    console.warn('Service worker nÃ£o pÃ´de ser registrado.');
                 });
             }
             */
@@ -1072,9 +1116,31 @@
             renderDiet();
             renderMetas();
             renderAgenda();
+            renderDailyMotivation();
         }
 
-        // ================= CONFIRMAÇÃO EMBUTIDA (CUSTOM MODAL) =================
+        const encouragingPhrases = [
+            "O que separa quem desiste de quem vence, muitas vezes, Ã© apenas a persistÃªncia.",
+            "VocÃª nÃ£o precisa fazer tudo hoje. SÃ³ precisa dar o prÃ³ximo passo.",
+            "ConstÃ¢ncia nÃ£o Ã© nunca falhar; Ã© sempre escolher recomeÃ§ar.",
+            "Seu progresso tambÃ©m conta nos dias em que vocÃª sÃ³ consegue avanÃ§ar devagar.",
+            "A disciplina fica mais leve quando vocÃª se trata com respeito durante o caminho.",
+            "Pequenos esforÃ§os repetidos constroem resultados que pareciam distantes.",
+            "Respire. Organize o prÃ³ximo passo e confie no processo.",
+            "Hoje nÃ£o precisa ser perfeito para ainda ser um dia de progresso.",
+            "A coragem aparece quando vocÃª comeÃ§a, mesmo sem se sentir totalmente pronto.",
+            "Persistir com gentileza Ã© uma forma poderosa de forÃ§a."
+        ];
+
+        function renderDailyMotivation() {
+            const el = document.getElementById('daily-motivation-text');
+            if (!el) return;
+            const now = new Date();
+            const dayKey = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 86400000);
+            el.innerText = encouragingPhrases[Math.abs(dayKey) % encouragingPhrases.length];
+        }
+
+        // ================= CONFIRMAÃ‡ÃƒO EMBUTIDA (CUSTOM MODAL) =================
         function triggerConfirm(msg, onOk) {
             document.getElementById('confirm-modal-description').innerText = msg;
             const btn = document.getElementById('confirm-modal-ok-btn');
@@ -1085,7 +1151,7 @@
             document.getElementById('confirm-modal').classList.add('active');
         }
 
-        // ================= RESET DIÁRIO INTELIGENTE COM GELINHO =================
+        // ================= RESET DIÃRIO INTELIGENTE COM GELINHO =================
         function checkDailyReset() {
             const today = new Date();
             today.setHours(0,0,0,0);
@@ -1110,11 +1176,11 @@
                         if (isLastDayPerfect) {
                             appState.streak = (appState.streak || 0) + 1;
                             addXP(100); 
-                            showToast(`🔥 Sequência mantida! ${appState.streak} dias perfeitos de Comando! +100 XP!`);
+                            showToast(`ðŸ”¥ SequÃªncia mantida! ${appState.streak} dias perfeitos de Comando! +100 XP!`);
                             
                             if (appState.streak % 10 === 0) {
                                 appState.freezes = Math.min((appState.freezes || 0) + 1, 3);
-                                showToast("❄️ Conquista Lendária! Você desbloqueou 1 Gelinho!");
+                                showToast("â„ï¸ Conquista LendÃ¡ria! VocÃª desbloqueou 1 Gelinho!");
                             }
                         } else {
                             missedDays += 1; 
@@ -1124,10 +1190,10 @@
                             if (appState.freezes && appState.freezes > 0) {
                                 appState.freezes--;
                                 missedDays--;
-                                showToast("❄️ Gelinho Consumido! A sequência de constância foi salva.");
+                                showToast("â„ï¸ Gelinho Consumido! A sequÃªncia de constÃ¢ncia foi salva.");
                             } else {
                                 appState.streak = 0;
-                                showToast("⚠️ Sequência de constância quebrada! Recomece os hábitos.");
+                                showToast("âš ï¸ SequÃªncia de constÃ¢ncia quebrada! Recomece os hÃ¡bitos.");
                                 break;
                             }
                         }
@@ -1145,7 +1211,14 @@
             }
         }
 
-        // ================= ESCALA 6x3 OPERACIONAL =================
+        // ================= ESCALA OPERACIONAL CONFIGURÃVEL =================
+        function isVacationDate(date) {
+            const v = appState.vacation || {};
+            if (!v.enabled || !v.start || !v.end) return false;
+            const check = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+            return check >= new Date(v.start + 'T00:00:00').getTime() && check <= new Date(v.end + 'T23:59:59').getTime();
+        }
+
         function getCycleDayInfo(dateToCheck) {
             const startStr = appState.scaleStartDate + 'T00:00:00';
             const startDate = new Date(startStr);
@@ -1153,14 +1226,29 @@
             const check = new Date(dateToCheck.getFullYear(), dateToCheck.getMonth(), dateToCheck.getDate());
             const diffTime = check - startDate;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const workDays = appState.scaleWorkDays || 6;
+            const offDays = appState.scaleOffDays || 3;
+            const cycleLength = workDays + offDays;
             let cycleDay = 1;
             if (diffDays >= 0) {
-                cycleDay = (diffDays % 9) + 1;
+                cycleDay = (diffDays % cycleLength) + 1;
             } else {
-                cycleDay = 9 - (Math.abs(diffDays) % 9);
-                if (cycleDay === 9 && (Math.abs(diffDays) % 9) === 0) cycleDay = 1;
+                cycleDay = ((diffDays % cycleLength) + cycleLength) % cycleLength + 1;
             }
-            return { dayOfCycle: cycleDay, isWork: cycleDay <= 6 };
+            return { dayOfCycle: cycleDay, isWork: cycleDay <= workDays, cycleLength, isVacation: isVacationDate(dateToCheck) };
+        }
+
+        function updateScalePattern() {
+            const work = parseInt(document.getElementById('scale-work-days').value);
+            const off = parseInt(document.getElementById('scale-off-days').value);
+            if (!work || !off || work < 1 || off < 1) return showToast('Informe uma escala vÃ¡lida.');
+            appState.scaleWorkDays = work; appState.scaleOffDays = off;
+            saveToStorage(); calculateScale(); renderCalendar(); showToast(`Escala ${work}x${off} atualizada!`);
+        }
+
+        function saveVacationSettings() {
+            appState.vacation = { enabled: document.getElementById('vacation-enabled').checked, start: document.getElementById('vacation-start').value, end: document.getElementById('vacation-end').value };
+            saveToStorage(); calculateScale(); renderCalendar();
         }
 
         function updateScaleDate(val) {
@@ -1175,12 +1263,20 @@
         function calculateScale() {
             const today = new Date();
             const info = getCycleDayInfo(today);
+            const workDays = appState.scaleWorkDays || 6;
+            const offDays = appState.scaleOffDays || 3;
+            document.getElementById('scale-name-label').innerText = `Escala Operacional (${workDays}x${offDays})`;
+            if (info.isVacation) {
+                document.getElementById('scale-status-text').innerText = 'Modo fÃ©rias ativo';
+                document.getElementById('scale-icon').innerText = 'ðŸ–ï¸';
+                return;
+            }
             const isWeekend = today.getDay() === 0 || today.getDay() === 6;
-            let icon = info.isWork ? '🏢' : '🌴';
+            let icon = info.isWork ? 'ðŸ¢' : 'ðŸŒ´';
             
-            let daysRemaining = info.isWork ? (6 - info.dayOfCycle + 1) : (9 - info.dayOfCycle + 1);
+            let daysRemaining = info.isWork ? (workDays - info.dayOfCycle + 1) : (info.cycleLength - info.dayOfCycle + 1);
             let stateName = info.isWork ? 'Trabalho' : 'Folga';
-            let txt = `Dia ${info.dayOfCycle} de 9 (${stateName} - Restam ${daysRemaining}d)`;
+            let txt = `Dia ${info.dayOfCycle} de ${info.cycleLength} (${stateName} - Restam ${daysRemaining}d)`;
             
             document.getElementById('scale-status-text').innerText = txt;
             document.getElementById('scale-icon').innerText = icon;
@@ -1212,7 +1308,7 @@
             const year = currentCalendarDate.getFullYear();
             const month = currentCalendarDate.getMonth();
             const today = new Date();
-            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            const monthNames = ["Janeiro", "Fevereiro", "MarÃ§o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
             document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1226,13 +1322,13 @@
                 const cellDate = new Date(year, month, day);
                 const info = getCycleDayInfo(cellDate);
                 let isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
-                let classType = info.isWork ? 'cal-work' : 'cal-free';
+                let classType = info.isVacation ? 'cal-vacation' : (info.isWork ? 'cal-work' : 'cal-free');
                 let todayClass = isToday ? 'cal-today' : '';
                 container.innerHTML += `<div class="cal-cell ${classType} ${todayClass}">${day}</div>`;
             }
         }
 
-        // ================= MULTIPÁGINA (TABS) =================
+        // ================= MULTIPÃGINA (TABS) =================
         function openTab(evt, tabId) {
             document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
             document.querySelectorAll(".tab-link").forEach(el => el.classList.remove("active-tab-btn"));
@@ -1244,21 +1340,9 @@
         function updateClockAndRoutine() {
             const now = new Date();
             document.getElementById('live-clock').innerText = now.toLocaleTimeString('pt-BR');
-            const currentFormattedTime = (now.getHours() * 100) + now.getMinutes();
-            const currentTasks = appState.routines[appState.currentMode] || [];
-            
-            currentTasks.forEach((task) => {
-                const el = document.getElementById(`task-card-${task.id}`);
-                if (el) {
-                    const isActive = (currentFormattedTime >= task.start && currentFormattedTime < task.end);
-                    const hasPulse = el.classList.contains('active-task-pulse');
-                    if (isActive && !hasPulse) renderRoutine();
-                    if (!isActive && hasPulse) renderRoutine();
-                }
-            });
         }
 
-        // ================= MOTOR DE ROTINA & GAMEFICAÇÃO =================
+        // ================= MOTOR DE ROTINA & GAMEFICAÃ‡ÃƒO =================
         function switchMode(mode) {
             appState.currentMode = mode;
             document.querySelectorAll('[id^="btn-mode-"]').forEach(btn => {
@@ -1283,9 +1367,8 @@
             if (!container) return;
             container.innerHTML = "";
             let tasks = appState.routines[appState.currentMode] || [];
-            tasks.sort((a,b) => a.start - b.start);
-            const now = new Date();
-            const currentFormattedTime = (now.getHours() * 100) + now.getMinutes();
+            const periodOrder = { manha: 0, tarde: 1, noite: 2 };
+            tasks.sort((a,b) => (periodOrder[a.period] ?? 0) - (periodOrder[b.period] ?? 0));
 
             const totalTasks = tasks.length;
             const completedTasks = tasks.filter(t => t.done).length;
@@ -1295,14 +1378,14 @@
             const progressBarEl = document.getElementById('routine-progress-bar');
             const motivationalTextEl = document.getElementById('routine-motivational-text');
 
-            if (progressPercentEl) progressPercentEl.innerText = `${progressPercent}% Concluído`;
+            if (progressPercentEl) progressPercentEl.innerText = `${progressPercent}% ConcluÃ­do`;
             if (progressBarEl) progressBarEl.style.width = `${progressPercent}%`;
 
-            let motTxt = "Execute a primeira tarefa para engrenar!";
-            if (progressPercent > 0 && progressPercent < 40) motTxt = "Começo sólido! Continue empurrando! ⚡";
-            else if (progressPercent >= 40 && progressPercent < 80) motTxt = "Mais da metade abatido! Sem quebras de padrão! ⚔️";
-            else if (progressPercent >= 80 && progressPercent < 100) motTxt = "Falta muito pouco para o dia perfeito! Foco total! 🏆";
-            else if (progressPercent === 100) motTxt = "Dia perfeito concluído! Padrão de elite atingido! 🔥";
+            let motTxt = "Comece pela tarefa mais leve. Um passo jÃ¡ Ã© progresso.";
+            if (progressPercent > 0 && progressPercent < 40) motTxt = "VocÃª comeÃ§ou â€” continue no seu ritmo. ðŸŒ±";
+            else if (progressPercent >= 40 && progressPercent < 80) motTxt = "Olha o quanto vocÃª jÃ¡ avanÃ§ou hoje. Continue! âœ¨";
+            else if (progressPercent >= 80 && progressPercent < 100) motTxt = "Falta pouco. Termine com calma e confianÃ§a. ðŸ†";
+            else if (progressPercent === 100) motTxt = "VocÃª cumpriu o que planejou. Valorize essa conquista! ðŸŽ‰";
             if (motivationalTextEl) motivationalTextEl.innerText = motTxt;
 
             if(tasks.length === 0) {
@@ -1310,15 +1393,21 @@
                 return;
             }
 
-            tasks.forEach(task => {
-                const isActive = (currentFormattedTime >= task.start && currentFormattedTime < task.end);
+            const periodInfo = { manha: ['â˜€ï¸', 'ManhÃ£'], tarde: ['ðŸŒ¤ï¸', 'Tarde'], noite: ['ðŸŒ™', 'Noite'] };
+            ['manha', 'tarde', 'noite'].forEach(period => {
+                const periodTasks = tasks.filter(t => (t.period || 'manha') === period);
+                if (!periodTasks.length) return;
+                const heading = document.createElement('div');
+                heading.className = 'text-[9px] font-black uppercase tracking-widest text-slate-400 mt-2 mb-0.5';
+                heading.innerText = `${periodInfo[period][0]} ${periodInfo[period][1]}`;
+                container.appendChild(heading);
+                periodTasks.forEach(task => {
                 const card = document.createElement('div');
                 card.id = `task-card-${task.id}`;
-                card.className = `flex items-center gap-3 bg-brandCard border border-brandBorder rounded-xl p-3.5 transition-all ${isActive ? 'active-task-pulse scale-[1.01]' : ''} ${task.done ? 'opacity-40' : ''}`;
+                card.className = `flex items-center gap-3 bg-brandCard border border-brandBorder rounded-xl p-3.5 transition-all ${task.done ? 'opacity-40' : ''}`;
                 card.innerHTML = `
                     <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTaskDone(${task.id})">
                     <div class="flex-1">
-                        <span class="text-[9px] font-extrabold ${isActive ? 'text-brandGreen' : 'text-slate-400'}">${task.time}</span>
                         <p class="text-[11px] leading-tight mt-0.5 ${task.done ? 'task-done-text' : 'text-slate-200 font-bold'}">${task.text}</p>
                     </div>
                     <div class="flex gap-1">
@@ -1327,6 +1416,7 @@
                     </div>
                 `;
                 container.appendChild(card);
+                });
             });
         }
 
@@ -1341,7 +1431,7 @@
             }
         }
 
-        // ================= COMPROMISSOS (AGENDA CRONOLÓGICA) =================
+        // ================= COMPROMISSOS (AGENDA CRONOLÃ“GICA) =================
         function calculateDaysRemaining(dateStr) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -1356,11 +1446,24 @@
             return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
-        function openAgendaModal() {
+        function openAgendaModal(id = null) {
+            document.getElementById('agenda-id').value = '';
+            document.getElementById('agenda-modal-title').innerText = 'ðŸ“… Novo Compromisso';
             document.getElementById('agenda-title').value = '';
             document.getElementById('agenda-date').value = '';
             document.getElementById('agenda-category').value = 'Pessoal';
             document.getElementById('agenda-subtasks').value = '';
+            if (id) {
+                const item = appState.agenda.find(x => x.id === id);
+                if (item) {
+                    document.getElementById('agenda-id').value = item.id;
+                    document.getElementById('agenda-modal-title').innerText = 'âœï¸ Editar Compromisso';
+                    document.getElementById('agenda-title').value = item.title;
+                    document.getElementById('agenda-date').value = item.date || '';
+                    document.getElementById('agenda-category').value = item.category;
+                    document.getElementById('agenda-subtasks').value = (item.subtasks || []).map(s => s.text).join(', ');
+                }
+            }
             document.getElementById('agenda-modal').classList.add('active');
         }
 
@@ -1369,9 +1472,10 @@
             const date = document.getElementById('agenda-date').value;
             const category = document.getElementById('agenda-category').value;
             const subtasksRaw = document.getElementById('agenda-subtasks').value.trim();
+            const editId = parseInt(document.getElementById('agenda-id').value);
 
-            if (!title || !date) {
-                showToast("Erro: Preencha pelo menos o título e a data.");
+            if (!title) {
+                showToast("Erro: Preencha o tÃ­tulo.");
                 return;
             }
 
@@ -1381,20 +1485,18 @@
                 done: false
             })).filter(s => s.text.length > 0) : [];
 
-            appState.agenda.push({
-                id: Date.now(),
-                title: title,
-                date: date,
-                category: category,
-                subtasks: subtasks,
-                done: false
-            });
+            if (editId) {
+                const item = appState.agenda.find(x => x.id === editId);
+                if (item) Object.assign(item, { title, date, category, subtasks });
+            } else {
+                appState.agenda.push({ id: Date.now(), title, date, category, subtasks, done: false });
+                addXP(15);
+            }
 
             saveToStorage();
             renderAgenda();
             closeModal('agenda-modal');
-            showToast("Compromisso agendado com sucesso! +15 XP 🚀");
-            addXP(15);
+            showToast(editId ? "Compromisso atualizado!" : "Compromisso adicionado! +15 XP ðŸš€");
         }
 
         function renderAgenda() {
@@ -1408,6 +1510,7 @@
             const events = appState.agenda || [];
             
             const hojeEventos = [];
+            const semDataEventos = [];
             const semanaEventos = [];
             const futurosEventos = [];
             const concluidosEventos = [];
@@ -1416,6 +1519,7 @@
                 if (item.done) {
                     concluidosEventos.push(item);
                 } else {
+                    if (!item.date) { semDataEventos.push(item); return; }
                     const daysRemaining = calculateDaysRemaining(item.date);
                     if (daysRemaining <= 0) {
                         hojeEventos.push(item);
@@ -1434,22 +1538,24 @@
             concluidosEventos.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             const makeEventHtml = (item) => {
-                const daysRemaining = calculateDaysRemaining(item.date);
-                const isOverdue = daysRemaining < 0;
+                const daysRemaining = item.date ? calculateDaysRemaining(item.date) : null;
+                const isOverdue = daysRemaining !== null && daysRemaining < 0;
                 
                 let countdownLabel = "";
                 let overdueClass = "";
-                if (daysRemaining === 0) {
-                    countdownLabel = "Hoje ⚡";
+                if (daysRemaining === null) {
+                    countdownLabel = "Sem prazo";
+                } else if (daysRemaining === 0) {
+                    countdownLabel = "Hoje âš¡";
                 } else if (isOverdue) {
-                    countdownLabel = `Atrasado ${Math.abs(daysRemaining)}d ⚠️`;
+                    countdownLabel = `Atrasado ${Math.abs(daysRemaining)}d âš ï¸`;
                     overdueClass = "border-brandRed/45 bg-red-950/5";
                 } else {
                     countdownLabel = `Faltam ${daysRemaining}d`;
                 }
 
                 let badgeColor = "bg-brandBlue/15 text-brandBlue border-brandBlue/30";
-                if (item.category === "Saúde") badgeColor = "bg-red-500/10 text-brandRed border-brandRed/20";
+                if (item.category === "SaÃºde") badgeColor = "bg-red-500/10 text-brandRed border-brandRed/20";
                 if (item.category === "Estudo") badgeColor = "bg-brandOrange/10 text-brandOrange border-brandOrange/20";
                 if (item.category === "Trabalho") badgeColor = "bg-brandCyan/10 text-brandCyan border-brandCyan/20";
                 if (item.category === "Pessoal") badgeColor = "bg-brandPurple/10 text-brandPurple border-brandPurple/20";
@@ -1463,7 +1569,7 @@
                     subtasksListHtml = `
                         <div class="mt-2.5 border-t border-brandBorder/60 pt-2 flex flex-col gap-1.5">
                             <div class="flex justify-between items-center text-[8px] font-black uppercase text-slate-400">
-                                <span>Ações (${completedSubs}/${totalSubs})</span>
+                                <span>AÃ§Ãµes (${completedSubs}/${totalSubs})</span>
                                 <span class="font-mono">${pct}%</span>
                             </div>
                             <div class="flex flex-col gap-1">
@@ -1486,7 +1592,7 @@
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="px-1.5 py-0.5 bg-brandDark text-[8px] font-extrabold uppercase rounded border ${badgeColor}">${item.category}</span>
-                                        <span class="text-[9px] font-mono font-bold text-slate-400">${formatDateString(item.date)}</span>
+                                        <span class="text-[9px] font-mono font-bold text-slate-400">${item.date ? formatDateString(item.date) : 'Sem prazo'}</span>
                                     </div>
                                     <h4 class="text-xs font-bold leading-tight mt-1 text-white truncate">${item.title}</h4>
                                 </div>
@@ -1494,6 +1600,7 @@
                             <div class="text-right flex flex-col items-end gap-1.5 ml-2">
                                 <span class="text-[9px] font-extrabold font-mono text-brandGreen bg-brandGreen/10 border border-brandGreen/25 px-2 py-0.5 rounded-full">${countdownLabel}</span>
                                 <div class="flex gap-1">
+                                    <button onclick="openAgendaModal(${item.id})" class="text-[8px] bg-brandGreen/15 border border-brandGreen/35 text-brandGreen px-1.5 py-0.5 rounded font-extrabold active:scale-95">Edit</button>
                                     <button onclick="openSubtaskModal('agenda', ${item.id})" class="text-[8px] bg-brandBlue/15 border border-brandBlue/35 text-brandBlue px-1.5 py-0.5 rounded font-extrabold active:scale-95">Sub</button>
                                     <button onclick="deleteAgendaItem(${item.id})" class="text-[8px] bg-brandRed/15 border border-brandRed/35 text-brandRed px-1.5 py-0.5 rounded font-extrabold active:scale-95">Del</button>
                                 </div>
@@ -1505,11 +1612,12 @@
             };
 
             let hojeSectionHtml = "";
+            let semDataSectionHtml = semDataEventos.length ? `<div class="mb-4"><h4 class="text-[9px] font-black uppercase text-brandGreen tracking-widest mb-2">ðŸ“Œ Tarefas sem prazo</h4><div class="flex flex-col gap-2.5">${semDataEventos.map(makeEventHtml).join('')}</div></div>` : '';
             if (hojeEventos.length > 0) {
                 hojeSectionHtml = `
                     <div class="mb-4">
                         <h4 class="text-[9px] font-black uppercase text-brandRed tracking-widest mb-2 flex items-center gap-1.5">
-                            <span>🚨</span><span>Hoje e Atrasados</span>
+                            <span>ðŸš¨</span><span>Hoje e Atrasados</span>
                             <span class="bg-brandRed/15 text-brandRed px-1.5 py-0.2 rounded-full font-mono text-[8px] border border-brandRed/25">${hojeEventos.length}</span>
                         </h4>
                         <div class="flex flex-col gap-2.5">
@@ -1524,7 +1632,7 @@
                 semanaSectionHtml = `
                     <div class="mb-4">
                         <h4 class="text-[9px] font-black uppercase text-brandBlue tracking-widest mb-2 flex items-center gap-1.5">
-                            <span>📅</span><span>Esta Semana</span>
+                            <span>ðŸ“…</span><span>Esta Semana</span>
                             <span class="bg-brandBlue/15 text-brandBlue px-1.5 py-0.2 rounded-full font-mono text-[8px] border border-brandBlue/25">${semanaEventos.length}</span>
                         </h4>
                         <div class="flex flex-col gap-2.5">
@@ -1539,7 +1647,7 @@
                 futuroSectionHtml = `
                     <div class="mb-4">
                         <h4 class="text-[10px] font-black uppercase text-brandPurple tracking-widest mb-2 flex items-center gap-1.5">
-                            <span>🌐</span><span>Mais Futuros / Este Mês</span>
+                            <span>ðŸŒ</span><span>Mais Futuros / Este MÃªs</span>
                             <span class="bg-brandPurple/15 text-brandPurple px-1.5 py-0.2 rounded-full font-mono text-[8px] border border-brandPurple/25">${futurosEventos.length}</span>
                         </h4>
                         <div class="flex flex-col gap-2.5">
@@ -1549,10 +1657,10 @@
                 `;
             }
 
-            if (hojeEventos.length === 0 && semanaEventos.length === 0 && futurosEventos.length === 0) {
-                sectionsContainer.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-5">Sua agenda está limpa! Nenhum compromisso à vista.</p>`;
+            if (semDataEventos.length === 0 && hojeEventos.length === 0 && semanaEventos.length === 0 && futurosEventos.length === 0) {
+                sectionsContainer.innerHTML = `<p class="text-[11px] text-slate-500 text-center py-5">Sua agenda estÃ¡ limpa! Nenhum compromisso Ã  vista.</p>`;
             } else {
-                sectionsContainer.innerHTML = hojeSectionHtml + semanaSectionHtml + futuroSectionHtml;
+                sectionsContainer.innerHTML = semDataSectionHtml + hojeSectionHtml + semanaSectionHtml + futuroSectionHtml;
             }
 
             if (concluidosEventos.length === 0) {
@@ -1621,7 +1729,7 @@
 
             document.getElementById('active-meta-count').innerText = active.length;
             if (active.length === 0) {
-                activeC.innerHTML = `<p class="text-[10px] text-slate-500 py-3 text-center font-bold">Todos os objetivos táticos batidos! 🚀</p>`;
+                activeC.innerHTML = `<p class="text-[10px] text-slate-500 py-3 text-center font-bold">Todos os objetivos tÃ¡ticos batidos! ðŸš€</p>`;
             } else {
                 active.forEach(m => {
                     const totalSubs = m.subtasks ? m.subtasks.length : 0;
@@ -1655,6 +1763,7 @@
                             <p class="text-[11px] text-slate-200 flex-1 pr-3 leading-tight font-medium">${m.text}</p>
                             <div class="flex gap-1.5">
                                 <button onclick="toggleMeta(${m.id})" class="px-2 py-1 bg-brandBlue/15 border border-brandBlue/35 text-brandBlue rounded-lg text-[9px] font-bold transition-all active:scale-95">Feito</button>
+                                <button onclick="openNewMetaModal(${m.id})" class="px-2 py-1 bg-brandGreen/15 text-brandGreen rounded-lg text-[9px] font-bold transition-all active:scale-95">Edit</button>
                                 <button onclick="openSubtaskModal('meta', ${m.id})" class="px-2 py-1 bg-brandPurple/20 text-brandPurple rounded-lg text-[9px] font-bold transition-all active:scale-95">Sub</button>
                                 <button onclick="triggerMetaDeleteConfirm(${m.id})" class="px-2 py-1 bg-brandRed/10 border border-brandRed/35 text-brandRed rounded-lg text-[9px] font-bold transition-all active:scale-95">Del</button>
                             </div>
@@ -1691,7 +1800,7 @@
                     addXP(-50);
                 }
                 saveToStorage(); renderMetas(); 
-                showToast(m.done ? "Meta alcançada e documentada! +50 XP 🏆" : "Meta movida de volta às pendentes.");
+                showToast(m.done ? "Meta alcanÃ§ada e documentada! +50 XP ðŸ†" : "Meta movida de volta Ã s pendentes.");
             } 
         }
 
@@ -1716,18 +1825,30 @@
             });
         }
 
-        function openNewMetaModal() {
+        function openNewMetaModal(id = null) {
+            document.getElementById('meta-modal-id').value = '';
+            document.getElementById('meta-modal-title').innerText = 'ðŸŽ¯ Adicionar Novo Objetivo';
             document.getElementById('new-meta-text-input').value = "";
             document.getElementById('new-meta-subtasks-input').value = "";
+            if (id) {
+                const meta = appState.metas.find(x => x.id === id);
+                if (meta) {
+                    document.getElementById('meta-modal-id').value = meta.id;
+                    document.getElementById('meta-modal-title').innerText = 'âœï¸ Editar Objetivo';
+                    document.getElementById('new-meta-text-input').value = meta.text;
+                    document.getElementById('new-meta-subtasks-input').value = (meta.subtasks || []).map(s => s.text).join(', ');
+                }
+            }
             document.getElementById('new-meta-modal').classList.add('active');
         }
 
         function saveNewMetaFromModal() {
             const text = document.getElementById('new-meta-text-input').value.trim();
             const subtasksRaw = document.getElementById('new-meta-subtasks-input').value.trim();
+            const editId = parseInt(document.getElementById('meta-modal-id').value);
 
             if(!text) {
-                showToast("Por favor, digite a descrição da sua meta.");
+                showToast("Por favor, digite a descriÃ§Ã£o da sua meta.");
                 return;
             }
 
@@ -1737,15 +1858,14 @@
                 done: false
             })).filter(s => s.text.length > 0) : [];
 
-            appState.metas.push({ 
-                id: Date.now(), 
-                type: appState.selectedMetaTab, 
-                text: text, 
-                subtasks: subtasks,
-                done: false 
-            });
+            if (editId) {
+                const meta = appState.metas.find(x => x.id === editId);
+                if (meta) Object.assign(meta, { text, subtasks });
+            } else {
+                appState.metas.push({ id: Date.now(), type: appState.selectedMetaTab, text, subtasks, done: false });
+            }
 
-            saveToStorage(); renderMetas(); closeModal('new-meta-modal'); showToast("Meta registrada no radar!");
+            saveToStorage(); renderMetas(); closeModal('new-meta-modal'); showToast(editId ? "Meta atualizada!" : "Meta registrada no radar!");
         }
 
         function filterMetas(type) {
@@ -1753,28 +1873,28 @@
             ['curto', 'medio', 'longo'].forEach(t => {
                 document.getElementById(`sub-btn-${t}`).className = `sub-tab-btn py-1.5 rounded-lg text-[10px] font-bold ${t === type ? 'text-white bg-brandBlue' : 'text-slate-400'}`;
             });
-            const hTitles = { curto: "A Fazer (30-60 Dias)", medio: "Tático (6m - 2a)", longo: "Estrutural (2-5a)" };
+            const hTitles = { curto: "A Fazer (30-60 Dias)", medio: "TÃ¡tico (6m - 2a)", longo: "Estrutural (2-5a)" };
             document.getElementById('meta-horizonte-title').innerText = hTitles[type];
             renderMetas();
         }
 
-        // ================= OPERAÇÕES DIETA & ÁGUA =================
+        // ================= OPERAÃ‡Ã•ES DIETA & ÃGUA =================
         function renderDiet() {
-            const { consumed, targetCal, targetProt, presets, waterConsumed, waterTarget } = appState.diet;
-            let sumCal = 0; let sumProt = 0;
+            const { consumed, targetCal, targetProt, targetCarb, targetFat, presets, waterConsumed, waterTarget } = appState.diet;
+            let sumCal = 0, sumProt = 0, sumCarb = 0, sumFat = 0;
             const listC = document.getElementById('diet-consumed-container');
             if (!listC) return;
             listC.innerHTML = "";
 
-            if(consumed.length === 0) listC.innerHTML = `<p class="text-[10px] text-slate-500 py-3 text-center font-bold">Nenhuma refeição registrada hoje.</p>`;
+            if(consumed.length === 0) listC.innerHTML = `<p class="text-[10px] text-slate-500 py-3 text-center font-bold">Nenhuma refeiÃ§Ã£o registrada hoje.</p>`;
             consumed.forEach(item => {
-                sumCal += item.cal; sumProt += item.prot;
+                sumCal += item.cal; sumProt += item.prot; sumCarb += item.carb || 0; sumFat += item.fat || 0;
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center bg-brandDark p-2.5 rounded-xl border border-brandBorder";
                 div.innerHTML = `
                     <div>
                         <p class="text-[11px] text-white font-extrabold">${item.name}</p>
-                        <p class="text-[9px] text-slate-400">${item.cal} kcal | ${item.prot}g prot</p>
+                        <p class="text-[9px] text-slate-400">${item.cal} kcal | ${item.prot}g prot | ${item.carb || 0}g carb | ${item.fat || 0}g gord</p>
                     </div>
                     <button onclick="removeDietItem(${item.uid})" class="text-[10px] bg-brandRed/15 text-brandRed hover:bg-brandRed hover:text-white px-2.5 py-1 rounded-lg font-bold transition-all">Remover</button>
                 `;
@@ -1787,6 +1907,8 @@
             const protTargetEl = document.getElementById('prot-target');
             const calBarEl = document.getElementById('cal-bar');
             const protBarEl = document.getElementById('prot-bar');
+            const carbBarEl = document.getElementById('carb-bar');
+            const fatBarEl = document.getElementById('fat-bar');
 
             if (calCurrentEl) calCurrentEl.innerText = sumCal;
             if (calTargetEl) calTargetEl.innerText = targetCal;
@@ -1794,6 +1916,12 @@
             if (protTargetEl) protTargetEl.innerText = targetProt;
             if (calBarEl) calBarEl.style.width = `${Math.min((sumCal/targetCal)*100, 100)}%`;
             if (protBarEl) protBarEl.style.width = `${Math.min((sumProt/targetProt)*100, 100)}%`;
+            document.getElementById('carb-current').innerText = sumCarb;
+            document.getElementById('carb-target').innerText = targetCarb;
+            document.getElementById('fat-current').innerText = sumFat;
+            document.getElementById('fat-target').innerText = targetFat;
+            if (carbBarEl) carbBarEl.style.width = `${Math.min((sumCarb/targetCarb)*100, 100)}%`;
+            if (fatBarEl) fatBarEl.style.width = `${Math.min((sumFat/targetFat)*100, 100)}%`;
 
             const waterCurrentEl = document.getElementById('water-current');
             const waterTargetEl = document.getElementById('water-target');
@@ -1815,7 +1943,7 @@
                     b.innerHTML = `
                         <div class="text-[10px] font-extrabold text-white line-clamp-1 mb-1">${p.name}</div>
                         <div class="flex justify-between text-[9px] font-mono font-bold">
-                            <span class="text-brandOrange">${p.cal} kcal</span><span class="text-brandBlue">${p.prot}g p</span>
+                            <span class="text-brandOrange">${p.cal} kcal</span><span class="text-brandBlue">${p.prot}g p</span><span class="text-brandGreen">${p.carb || 0}g c</span><span class="text-brandPurple">${p.fat || 0}g g</span>
                         </div>
                     `;
                     b.onclick = () => addDietItem(p);
@@ -1827,12 +1955,12 @@
         function triggerDietResetConfirm() {
             triggerConfirm("Zerar o consumo nutricional de hoje?", () => {
                 appState.diet.consumed = [];
-                saveToStorage(); renderDiet(); showToast("Nutrição diária de hoje zerada.");
+                saveToStorage(); renderDiet(); showToast("NutriÃ§Ã£o diÃ¡ria de hoje zerada.");
             });
         }
 
         function addDietItem(item) {
-            appState.diet.consumed.push({ uid: Date.now(), name: item.name, cal: parseInt(item.cal), prot: parseInt(item.prot) });
+            appState.diet.consumed.push({ uid: Date.now(), name: item.name, cal: parseInt(item.cal), prot: parseInt(item.prot), carb: parseInt(item.carb) || 0, fat: parseInt(item.fat) || 0 });
             saveToStorage(); renderDiet(); showToast("Alimento adicionado!");
         }
         
@@ -1843,13 +1971,13 @@
 
         function addWater(amount) {
             appState.diet.waterConsumed += amount;
-            saveToStorage(); renderDiet(); showToast(`+${amount}ml de água! 💧`);
+            saveToStorage(); renderDiet(); showToast(`+${amount}ml de Ã¡gua! ðŸ’§`);
         }
 
         function triggerWaterResetConfirm() {
-            triggerConfirm("Zerar o controle de água de hoje?", () => {
+            triggerConfirm("Zerar o controle de Ã¡gua de hoje?", () => {
                 appState.diet.waterConsumed = 0;
-                saveToStorage(); renderDiet(); showToast("Hidratação diária zerada.");
+                saveToStorage(); renderDiet(); showToast("HidrataÃ§Ã£o diÃ¡ria zerada.");
             });
         }
 
@@ -1857,6 +1985,8 @@
             document.getElementById('custom-meal-name').value = "";
             document.getElementById('custom-meal-cal').value = "";
             document.getElementById('custom-meal-prot').value = "";
+            document.getElementById('custom-meal-carb').value = "";
+            document.getElementById('custom-meal-fat').value = "";
             document.getElementById('custom-meal-modal').classList.add('active');
         }
         
@@ -1864,11 +1994,13 @@
             const name = document.getElementById('custom-meal-name').value;
             const cal = document.getElementById('custom-meal-cal').value;
             const prot = document.getElementById('custom-meal-prot').value;
+            const carb = document.getElementById('custom-meal-carb').value;
+            const fat = document.getElementById('custom-meal-fat').value;
             if(!name || !cal || !prot) {
                 showToast("Erro: Preencha todos os campos.");
                 return;
             }
-            addDietItem({ name, cal, prot });
+            addDietItem({ name, cal, prot, carb, fat });
             closeModal('custom-meal-modal');
         }
 
@@ -1886,39 +2018,61 @@
                 el.innerHTML = `
                     <div class="flex-1 pr-2">
                         <p class="text-[10px] text-white font-bold truncate">${p.name}</p>
-                        <p class="text-[8px] text-slate-400">${p.cal} kcal | ${p.prot}g prot</p>
+                        <p class="text-[8px] text-slate-400">${p.cal} kcal | ${p.prot}g prot | ${p.carb || 0}g carb | ${p.fat || 0}g gord</p>
                     </div>
-                    <button onclick="triggerDeletePresetConfirm(${p.id})" class="text-[9px] text-brandRed bg-brandRed/10 border border-brandRed/20 px-2 py-1 rounded-lg font-bold">Excluir</button>
+                    <div class="flex gap-1"><button onclick="editPreset(${p.id})" class="text-[9px] text-brandGreen bg-brandGreen/10 border border-brandGreen/20 px-2 py-1 rounded-lg font-bold">Editar</button><button onclick="triggerDeletePresetConfirm(${p.id})" class="text-[9px] text-brandRed bg-brandRed/10 border border-brandRed/20 px-2 py-1 rounded-lg font-bold">Excluir</button></div>
                 `;
                 container.appendChild(el);
             });
         }
 
         function triggerDeletePresetConfirm(id) {
-            triggerConfirm("Excluir este botão de adição rápida de refeição?", () => {
+            triggerConfirm("Excluir este botÃ£o de adiÃ§Ã£o rÃ¡pida de refeiÃ§Ã£o?", () => {
                 appState.diet.presets = appState.diet.presets.filter(x => x.id !== id);
-                saveToStorage(); renderPresetManagerList(); renderDiet(); showToast("Botão rápido removido.");
+                saveToStorage(); renderPresetManagerList(); renderDiet(); showToast("BotÃ£o rÃ¡pido removido.");
             });
+        }
+
+        function editPreset(id) {
+            const p = appState.diet.presets.find(x => x.id === id); if (!p) return;
+            document.getElementById('new-preset-id').value = p.id;
+            document.getElementById('new-preset-name').value = p.name;
+            document.getElementById('new-preset-cal').value = p.cal;
+            document.getElementById('new-preset-prot').value = p.prot;
+            document.getElementById('new-preset-carb').value = p.carb || 0;
+            document.getElementById('new-preset-fat').value = p.fat || 0;
+            document.getElementById('save-preset-button').innerText = 'Salvar AlteraÃ§Ãµes';
         }
 
         function saveNewPreset() {
             const name = document.getElementById('new-preset-name').value;
             const cal = document.getElementById('new-preset-cal').value;
             const prot = document.getElementById('new-preset-prot').value;
+            const carb = document.getElementById('new-preset-carb').value;
+            const fat = document.getElementById('new-preset-fat').value;
+            const editId = parseInt(document.getElementById('new-preset-id').value);
             if(!name || !cal || !prot) {
                 showToast("Erro: Preencha todos os campos.");
                 return;
             }
-            appState.diet.presets.push({ id: Date.now(), name, cal: parseInt(cal), prot: parseInt(prot) });
+            const values = { name, cal: parseInt(cal), prot: parseInt(prot), carb: parseInt(carb) || 0, fat: parseInt(fat) || 0 };
+            if (editId) Object.assign(appState.diet.presets.find(x => x.id === editId), values);
+            else appState.diet.presets.push({ id: Date.now(), ...values });
+            document.getElementById('new-preset-id').value = '';
             document.getElementById('new-preset-name').value = '';
             document.getElementById('new-preset-cal').value = ''; 
             document.getElementById('new-preset-prot').value = '';
-            saveToStorage(); renderPresetManagerList(); renderDiet(); showToast("Prato rápido salvo!");
+            document.getElementById('new-preset-carb').value = '';
+            document.getElementById('new-preset-fat').value = '';
+            document.getElementById('save-preset-button').innerText = 'Salvar Novo BotÃ£o';
+            saveToStorage(); renderPresetManagerList(); renderDiet(); showToast(editId ? "Atalho atualizado!" : "Prato rÃ¡pido salvo!");
         }
 
         function openGoalSettingsModal() {
             document.getElementById('goal-modal-cal').value = appState.diet.targetCal;
             document.getElementById('goal-modal-prot').value = appState.diet.targetProt;
+            document.getElementById('goal-modal-carb').value = appState.diet.targetCarb;
+            document.getElementById('goal-modal-fat').value = appState.diet.targetFat;
             document.getElementById('goal-modal-water').value = appState.diet.waterTarget;
             document.getElementById('goal-settings-modal').classList.add('active');
         }
@@ -1926,24 +2080,26 @@
         function saveGoalSettings() {
             const cal = parseInt(document.getElementById('goal-modal-cal').value);
             const prot = parseInt(document.getElementById('goal-modal-prot').value);
+            const carb = parseInt(document.getElementById('goal-modal-carb').value);
+            const fat = parseInt(document.getElementById('goal-modal-fat').value);
             const water = parseInt(document.getElementById('goal-modal-water').value);
-            if (isNaN(cal) || isNaN(prot) || isNaN(water) || cal <= 0 || prot <= 0 || water <= 0) {
-                showToast("Insira valores válidos.");
+            if (isNaN(cal) || isNaN(prot) || isNaN(carb) || isNaN(fat) || isNaN(water) || cal <= 0 || prot <= 0 || carb <= 0 || fat <= 0 || water <= 0) {
+                showToast("Insira valores vÃ¡lidos.");
                 return;
             }
             appState.diet.targetCal = cal;
             appState.diet.targetProt = prot;
+            appState.diet.targetCarb = carb;
+            appState.diet.targetFat = fat;
             appState.diet.waterTarget = water;
-            saveToStorage(); renderDiet(); closeModal('goal-settings-modal'); showToast("Metas diárias atualizadas!");
+            saveToStorage(); renderDiet(); closeModal('goal-settings-modal'); showToast("Metas diÃ¡rias atualizadas!");
         }
 
-        // ================= OPERAÇÕES TAREFAS DE ROTINA =================
+        // ================= OPERAÃ‡Ã•ES TAREFAS DE ROTINA =================
         function openTaskModal(id) {
             const modalTitle = document.getElementById('task-modal-title');
             document.getElementById('task-modal-id').value = '';
-            document.getElementById('task-modal-time').value = '';
-            document.getElementById('task-modal-start').value = '';
-            document.getElementById('task-modal-end').value = '';
+            document.getElementById('task-modal-period').value = 'manha';
             document.getElementById('task-modal-text').value = '';
 
             if (id) {
@@ -1951,9 +2107,7 @@
                 if (task) {
                     modalTitle.innerText = "Editar Tarefa";
                     document.getElementById('task-modal-id').value = task.id;
-                    document.getElementById('task-modal-time').value = task.time;
-                    document.getElementById('task-modal-start').value = task.start;
-                    document.getElementById('task-modal-end').value = task.end;
+                    document.getElementById('task-modal-period').value = task.period || 'manha';
                     document.getElementById('task-modal-text').value = task.text;
                 }
             } else {
@@ -1965,13 +2119,11 @@
 
         function saveTaskModal() {
             const idVal = document.getElementById('task-modal-id').value;
-            const time = document.getElementById('task-modal-time').value.trim();
-            const start = parseInt(document.getElementById('task-modal-start').value);
-            const end = parseInt(document.getElementById('task-modal-end').value);
+            const period = document.getElementById('task-modal-period').value;
             const text = document.getElementById('task-modal-text').value.trim();
 
-            if (!time || isNaN(start) || isNaN(end) || !text) {
-                showToast("Erro: Preencha todos os campos corretamente.");
+            if (!period || !text) {
+                showToast("Erro: Preencha a descriÃ§Ã£o da tarefa.");
                 return;
             }
 
@@ -1980,16 +2132,14 @@
             if (idVal) {
                 const task = currentTasks.find(t => t.id === parseInt(idVal));
                 if (task) {
-                    task.time = time;
-                    task.start = start;
-                    task.end = end;
+                    task.period = period;
                     task.text = text;
                     showToast("Tarefa atualizada!");
                 }
             } else {
                 const newId = Date.now();
-                currentTasks.push({ id: newId, time, start, end, text, done: false });
-                showToast("Tarefa adicionada à rotina!");
+                currentTasks.push({ id: newId, period, text, done: false });
+                showToast("Tarefa adicionada Ã  rotina!");
             }
 
             saveToStorage();
@@ -2000,7 +2150,7 @@
         function triggerTaskDeleteConfirm(id) {
             triggerConfirm("Apagar esta tarefa permanentemente da sua rotina?", () => {
                 appState.routines[appState.currentMode] = appState.routines[appState.currentMode].filter(x => x.id !== id);
-                saveToStorage(); renderRoutine(); showToast("Tarefa excluída.");
+                saveToStorage(); renderRoutine(); showToast("Tarefa excluÃ­da.");
             });
         }
 
@@ -2043,16 +2193,16 @@
 
             const apiKey = appState.geminiApiKey; 
             if (!apiKey) {
-                showToast("⚠️ Vá na aba 'Ajustes' e cole sua Chave Gemini lá.");
-                btnText.innerText = "Analisar Alimento ⚡";
+                showToast("âš ï¸ VÃ¡ na aba 'Ajustes' e cole sua Chave Gemini lÃ¡.");
+                btnText.innerText = "Analisar Alimento âš¡";
                 spinner.classList.add('hidden');
                 return;
             }
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-            const systemPrompt = `Você é um nutricionista focado em performance. Estime calorias e proteínas da comida em formato JSON estruturado.
-            Responda EXCLUSIVAMENTE em JSON conforme o responseSchema. No campo 'name', use um termo conciso. No campo 'explanation', dê detalhes breves de até 120 caracteres.`;
+            const systemPrompt = `VocÃª Ã© um nutricionista focado em performance. Estime calorias, proteÃ­nas, carboidratos e gorduras da comida em formato JSON estruturado.
+            Responda EXCLUSIVAMENTE em JSON conforme o responseSchema. No campo 'name', use um termo conciso. No campo 'explanation', dÃª detalhes breves de atÃ© 120 caracteres.`;
 
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
@@ -2065,9 +2215,11 @@
                             name: { type: "STRING" },
                             cal: { type: "INTEGER" },
                             prot: { type: "INTEGER" },
+                            carb: { type: "INTEGER" },
+                            fat: { type: "INTEGER" },
                             explanation: { type: "STRING" }
                         },
-                        required: ["name", "cal", "prot", "explanation"]
+                        required: ["name", "cal", "prot", "carb", "fat", "explanation"]
                     }
                 }
             };
@@ -2081,7 +2233,7 @@
                 const data = await response.json();
                 
                 if (data.error) {
-                    throw new Error(data.error.message || "Chave inválida ou revogada.");
+                    throw new Error(data.error.message || "Chave invÃ¡lida ou revogada.");
                 }
 
                 const aiRawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -2093,24 +2245,26 @@
                 document.getElementById('ai-result-name').innerText = result.name;
                 document.getElementById('ai-result-cal').innerText = `${result.cal} kcal`;
                 document.getElementById('ai-result-prot').innerText = `${result.prot}g`;
+                document.getElementById('ai-result-carb').innerText = `${result.carb}g`;
+                document.getElementById('ai-result-fat').innerText = `${result.fat}g`;
                 document.getElementById('ai-result-explanation').innerText = result.explanation;
                 resultCard.classList.remove('hidden');
-                showToast("Alimento analisado! 🎉");
+                showToast("Alimento analisado! ðŸŽ‰");
             } catch (err) {
                 console.error(err);
                 showToast("Erro IA: " + err.message);
             } finally {
-                btnText.innerText = "Analisar Alimento ⚡";
+                btnText.innerText = "Analisar Alimento âš¡";
                 spinner.classList.add('hidden');
             }
         }
 
         function addAIResultToDiet() {
             if (!lastAIResult) {
-                showToast("Nenhuma análise disponível para adicionar.");
+                showToast("Nenhuma anÃ¡lise disponÃ­vel para adicionar.");
                 return;
             }
-            addDietItem({ name: lastAIResult.name, cal: lastAIResult.cal, prot: lastAIResult.prot });
+            addDietItem({ name: lastAIResult.name, cal: lastAIResult.cal, prot: lastAIResult.prot, carb: lastAIResult.carb, fat: lastAIResult.fat });
             document.getElementById('ai-result-card').classList.add('hidden');
             document.getElementById('ai-diet-prompt').value = '';
             lastAIResult = null;
@@ -2118,7 +2272,7 @@
 
         function saveAIResultAsPreset() {
             if (!lastAIResult) {
-                showToast("Nenhuma análise disponível para salvar.");
+                showToast("Nenhuma anÃ¡lise disponÃ­vel para salvar.");
                 return;
             }
             appState.diet.presets.push({
@@ -2126,15 +2280,17 @@
                 name: lastAIResult.name,
                 cal: lastAIResult.cal,
                 prot: lastAIResult.prot
+                ,carb: lastAIResult.carb,
+                fat: lastAIResult.fat
             });
             saveToStorage();
             renderDiet();
-            showToast("Atalho salvo com sucesso! ⚡");
+            showToast("Atalho salvo com sucesso! âš¡");
         }
 
         async function askMentorAI() {
             const excuseInput = document.getElementById('ai-mentor-excuse');
-            const excuse = excuseInput.value.trim() || "Estou com preguiça e pensando em quebrar a rotina hoje.";
+            const excuse = excuseInput.value.trim() || "Estou com preguiÃ§a e pensando em quebrar a rotina hoje.";
             
             const btn = document.getElementById('btn-ask-mentor');
             const spinner = document.getElementById('mentor-spinner');
@@ -2147,7 +2303,7 @@
 
             const apiKey = appState.geminiApiKey; 
             if (!apiKey) {
-                showToast("⚠️ Vá na aba 'Ajustes' e cole sua Chave Gemini lá.");
+                showToast("âš ï¸ VÃ¡ na aba 'Ajustes' e cole sua Chave Gemini lÃ¡.");
                 btn.disabled = false;
                 spinner.classList.add('hidden');
                 return;
@@ -2160,13 +2316,13 @@
             const total = tasks.length;
             const completionPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-            const systemPrompt = `Você é David Goggins mesclado com um sargento instrutor implacável.
-            O usuário está procrastinando e quer desculpas. Destrua a preguiça dele.
-            Saiba que hoje ele concluiu apenas ${completionPercent}% da rotina diária (${completed} de ${total} tarefas).
-            Seja curto (máximo de 4 linhas / 250 caracteres), agressivo e motivador de forma visceral. Sem enrolações. Vá direto à cobrança.`;
+            const systemPrompt = `VocÃª Ã© um mentor acolhedor e incentivador, com o tom calmo de um aplicativo de bem-estar.
+            O usuÃ¡rio estÃ¡ procrastinando e precisa de incentivo prÃ¡tico, sem humilhaÃ§Ã£o, agressividade ou culpa.
+            Saiba que hoje ele concluiu apenas ${completionPercent}% da rotina diÃ¡ria (${completed} de ${total} tarefas).
+            Seja curto (mÃ¡ximo de 4 linhas / 250 caracteres), gentil, esperanÃ§oso e concreto. ReconheÃ§a a dificuldade e convide a pessoa a dar um pequeno prÃ³ximo passo.`;
 
             const payload = {
-                contents: [{ parts: [{ text: `Desculpa do usuário: "${excuse}"` }] }],
+                contents: [{ parts: [{ text: `Desculpa do usuÃ¡rio: "${excuse}"` }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
 
@@ -2179,7 +2335,7 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    throw new Error(data.error.message || "Chave inválida ou revogada.");
+                    throw new Error(data.error.message || "Chave invÃ¡lida ou revogada.");
                 }
 
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -2188,7 +2344,7 @@
                 resultText.innerText = text;
                 resultDiv.classList.remove('hidden');
                 excuseInput.value = "";
-                showToast("Foco blindado! 💀");
+                showToast("Um passo de cada vez ðŸŒ±");
             } catch (err) {
                 console.error(err);
                 showToast("Erro IA: " + err.message);
@@ -2198,9 +2354,9 @@
             }
         }
 
-        // ================= SISTEMA DE BACKUP & COPIA SENSÍVEL A IFRAMES =================
+        // ================= SISTEMA DE BACKUP & COPIA SENSÃVEL A IFRAMES =================
         function triggerResetDefaultConfirm() {
-            triggerConfirm("Restaurar todas as configurações originais? Isso vai apagar rotina personalizada, metas, agenda e histórico de dieta salvos neste dispositivo.", () => {
+            triggerConfirm("Restaurar todas as configuraÃ§Ãµes originais? Isso vai apagar rotina personalizada, metas, agenda e histÃ³rico de dieta salvos neste dispositivo.", () => {
                 safeStorage.removeItem('planner_v7_rpg');
                 location.reload();
             });
@@ -2227,12 +2383,12 @@
         }
 
         function copyToWord() {
-            const makeList = arr => arr.map(m => `<tr><td style="padding:10px;font-size:11pt;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;">${m.done ? `<s>${m.text}</s>` : m.text}</td><td style="padding:10px;color:${m.done?'#10b981':'#f59e0b'};border-bottom:1px solid #e2e8f0;font-weight:bold;font-family:Arial,sans-serif;text-align:right;">${m.done?'CONCLUÍDO':'PENDENTE'}</td></tr>`).join('');
-            const makeAgendaList = arr => arr.map(a => `<tr><td style="padding:10px;font-size:11pt;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;"><b>[${a.category}]</b> ${a.title} (Data: ${new Date(a.date+'T00:00:00').toLocaleDateString('pt-BR')})</td><td style="padding:10px;color:${a.done?'#10b981':'#f59e0b'};border-bottom:1px solid #e2e8f0;font-weight:bold;font-family:Arial,sans-serif;text-align:right;">${a.done?'CONCLUÍDO':'PENDENTE'}</td></tr>`).join('');
+            const makeList = arr => arr.map(m => `<tr><td style="padding:10px;font-size:11pt;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;">${m.done ? `<s>${m.text}</s>` : m.text}</td><td style="padding:10px;color:${m.done?'#10b981':'#f59e0b'};border-bottom:1px solid #e2e8f0;font-weight:bold;font-family:Arial,sans-serif;text-align:right;">${m.done?'CONCLUÃDO':'PENDENTE'}</td></tr>`).join('');
+            const makeAgendaList = arr => arr.map(a => `<tr><td style="padding:10px;font-size:11pt;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;"><b>[${a.category}]</b> ${a.title} (Data: ${new Date(a.date+'T00:00:00').toLocaleDateString('pt-BR')})</td><td style="padding:10px;color:${a.done?'#10b981':'#f59e0b'};border-bottom:1px solid #e2e8f0;font-weight:bold;font-family:Arial,sans-serif;text-align:right;">${a.done?'CONCLUÃDO':'PENDENTE'}</td></tr>`).join('');
             
             const html = `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;color:#111827;padding:20px;border:1px solid #e2e8f0;border-radius:12px;">
-                <h1 style="color:#1e3a8a;border-bottom:3px solid #3b82f6;padding-bottom:10px;text-transform:uppercase;font-size:18pt;margin-bottom:20px;">Central de Comando - Relatório Geral</h1>
+                <h1 style="color:#1e3a8a;border-bottom:3px solid #3b82f6;padding-bottom:10px;text-transform:uppercase;font-size:18pt;margin-bottom:20px;">Central de Comando - RelatÃ³rio Geral</h1>
                 
                 <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Compromissos Agendados</h2>
                 <table style="width:100%;border-collapse:collapse;margin-bottom:25px;">${appState.agenda.length > 0 ? makeAgendaList(appState.agenda) : '<tr><td style="padding:10px;font-size:11pt;color:#6b7280;">Nenhum compromisso agendado.</td></tr>'}</table>
@@ -2240,7 +2396,7 @@
                 <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Curto Prazo (30-60 dias)</h2>
                 <table style="width:100%;border-collapse:collapse;margin-bottom:25px;">${makeList(appState.metas.filter(m=>m.type==='curto'))}</table>
                 
-                <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Médio Prazo (6 Meses a 2 anos)</h2>
+                <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">MÃ©dio Prazo (6 Meses a 2 anos)</h2>
                 <table style="width:100%;border-collapse:collapse;margin-bottom:25px;">${makeList(appState.metas.filter(m=>m.type==='medio'))}</table>
                 
                 <h2 style="color:#1e3a8a;font-size:13pt;margin-top:20px;margin-bottom:10px;border-bottom:1px solid #3b82f6;padding-bottom:4px;">Longo Prazo (2 a 5 anos)</h2>
@@ -2255,7 +2411,7 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    showToast("Copiado com sucesso! Agora é só colar no Word.");
+                    showToast("Copiado com sucesso! Agora Ã© sÃ³ colar no Word.");
                 } else {
                     throw new Error();
                 }
