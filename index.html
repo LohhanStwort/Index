@@ -2200,7 +2200,7 @@
                 return;
             }
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
             const systemPrompt = `Voc\u00EA \u00E9 um nutricionista focado em performance. Estime calorias, prote\u00EDnas, carboidratos e gorduras da comida em formato JSON estruturado.
             Responda EXCLUSIVAMENTE em JSON conforme o responseSchema. No campo 'name', use um termo conciso. No campo 'explanation', d\u00EA detalhes breves de at\u00E9 120 caracteres.`;
@@ -2310,7 +2310,7 @@
                 return;
             }
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
             const tasks = appState.routines[appState.currentMode] || [];
             const completed = tasks.filter(t => t.done).length;
